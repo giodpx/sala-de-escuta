@@ -75,6 +75,11 @@
             <span id="saveStatusText">Salvamento ativo</span>
           </div>
 
+          <div id="syncStatusBadge" class="flex items-center gap-1.5 bg-white/80 px-3 py-1 rounded-lg border border-sky-300/80 text-sky-950 font-medium shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-sky-600"></span>
+            <span id="syncStatusText">Nuvem vinculada</span>
+          </div>
+
           <div id="recoveredDraftBanner" class="hidden text-[10px] bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded font-semibold flex items-center gap-1 whitespace-nowrap shadow-sm">
             Rascunho recuperado
           </div>
@@ -823,7 +828,7 @@
                 <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
                   <input type="checkbox" name="b6_dren_gargalos" value="Sem plano de contingencia" class="custom-checkbox"> <span>Defesa Civil sem plano/alerta</span>
                 </label>
-                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                <label class="flex items-checkbox gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
                   <input type="checkbox" name="b6_dren_gargalos" value="Outro" class="custom-checkbox"> <span>Outro</span>
                 </label>
               </div>
@@ -970,11 +975,12 @@
             <div>
               <div class="flex items-center justify-between mb-2">
                 <label class="block font-bold text-slate-700 uppercase tracking-wider">
-                  Carteira de Projetos / Obras Pretendidas ou Aprovadas:
+                  Carteira de Projetos (Até 5 Projetos Prioritários):
                 </label>
-                <button type="button" onclick="addProjectRow()" class="px-2.5 py-1 bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold rounded-lg text-xs flex items-center gap-1 transition">
+                <button type="button" id="btnAddProject" onclick="addProjectRow()" class="px-2.5 py-1 bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold rounded-lg text-xs flex items-center gap-1 transition">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                  Adicionar Novo Projeto
+                  <span>Adicionar Projeto</span>
+                  <span id="projectCounterBadge" class="bg-sky-600 text-white rounded-full px-1.5 py-0.2 text-[10px] font-bold ml-1">0/5</span>
                 </button>
               </div>
 
@@ -982,6 +988,7 @@
                 <table class="min-w-full divide-y divide-slate-200 text-xs" id="projectsTable">
                   <thead class="bg-slate-100 text-slate-700 font-bold uppercase tracking-wider">
                     <tr>
+                      <th scope="col" class="py-2 px-2 text-center w-8">#</th>
                       <th scope="col" class="py-2 px-2.5 text-left w-1/4">Objeto da Obra / Eixo</th>
                       <th scope="col" class="py-2 px-2.5 text-left w-1/4">Estágio / Situação</th>
                       <th scope="col" class="py-2 px-2.5 text-left w-1/4">Fonte Pretendida / Valor</th>
@@ -991,6 +998,7 @@
                   </thead>
                   <tbody class="bg-white divide-y divide-slate-100" id="projectsTableBody">
                     <tr class="project-row">
+                      <td class="py-1.5 px-2 text-center font-bold text-slate-500 row-idx">1</td>
                       <td class="py-1.5 px-2"><input type="text" name="proj_objeto[]" placeholder="Ex: Ampliação da ETA Sede" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
                       <td class="py-1.5 px-2"><input type="text" name="proj_situacao[]" placeholder="Ex: Projeto básico aprovado" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
                       <td class="py-1.5 px-2"><input type="text" name="proj_valor[]" placeholder="Ex: R$ 4,5M - Novo PAC" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
@@ -1000,6 +1008,7 @@
                       </td>
                     </tr>
                     <tr class="project-row">
+                      <td class="py-1.5 px-2 text-center font-bold text-slate-500 row-idx">2</td>
                       <td class="py-1.5 px-2"><input type="text" name="proj_objeto[]" placeholder="Ex: Esgoto Bairro Novo" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
                       <td class="py-1.5 px-2"><input type="text" name="proj_situacao[]" placeholder="Ex: Cadastrado Transferegov" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
                       <td class="py-1.5 px-2"><input type="text" name="proj_valor[]" placeholder="Ex: R$ 6M - MCID / OGU" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
@@ -1193,7 +1202,7 @@
       <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
         <div>
           <h4 class="text-sm font-bold text-slate-900">Finalização da Escuta Municipal</h4>
-          <p class="text-xs text-slate-500">Salva no banco local deste dispositivo e reinicia a tela para o próximo município.</p>
+          <p class="text-xs text-slate-500">Salva no banco local deste dispositivo, na planilha online do Google Sheets e reinicia a tela.</p>
         </div>
         <div class="flex items-center flex-wrap gap-3 w-full sm:w-auto">
           <button type="button" onclick="confirmResetDraft()" class="px-4 py-2.5 text-xs font-semibold text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl border border-slate-200 transition">
@@ -1205,7 +1214,7 @@
             <span>Baixar CSV Desta Escuta</span>
           </button>
 
-          <button type="button" onclick="finalizeInterview()" class="flex-1 sm:flex-initial px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-brand-700 to-blue-600 hover:from-brand-800 hover:to-blue-700 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer transform hover:-translate-y-0.5">
+          <button type="button" id="btnFinalize" onclick="finalizeInterview()" class="flex-1 sm:flex-initial px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-brand-700 to-blue-600 hover:from-brand-800 hover:to-blue-700 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer transform hover:-translate-y-0.5">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
             <span>Finalizar e Gravar Escuta</span>
           </button>
@@ -1295,7 +1304,7 @@
         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
       </div>
       <h3 class="text-lg font-black text-slate-900 mb-1">Escuta Registrada com Sucesso!</h3>
-      <p class="text-xs text-slate-500 mb-4">Dados salvos com segurança no armazenamento local.</p>
+      <p class="text-xs text-slate-500 mb-4" id="successSyncNotice">Salva localmente e sincronizada com a planilha online.</p>
       
       <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-left text-xs mb-4 space-y-1">
         <div><strong>ID da Escuta:</strong> <span id="successModalId" class="font-mono text-blue-700 font-bold"></span></div>
@@ -1343,8 +1352,14 @@
 
   <!-- JAVASCRIPT -->
   <script>
+    // =========================================================================
+    // COLE AQUI A SUA URL GERADA NO APPS SCRIPT DO GOOGLE SHEETS:
+    // =========================================================================
+    const GOOGLE_SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyPT9oNcs7ByyYVU5ZK4y6G-RBGxmUHWDTTbcvOmdx79fV3csvtQGhzEOcgz8j_0ahWJw/exec';
+
     const STORAGE_KEY_DRAFT = 'sanea_draft_v7';
     const STORAGE_KEY_LIST = 'sanea_interviews_v7';
+    const MAX_PROJECTS = 5;
 
     let lastSaveTimestamp = Date.now();
 
@@ -1361,7 +1376,18 @@
       setInterval(updateSaveStatusIndicator, 5000);
       recalcularNumeracaoTopicos();
       updateProgressBar();
+      updateProjectUIState();
+      verificarStatusNuvem();
     });
+
+    function verificarStatusNuvem() {
+      const text = document.getElementById('syncStatusText');
+      if (GOOGLE_SHEETS_WEB_APP_URL && GOOGLE_SHEETS_WEB_APP_URL !== 'COLE_SEU_LINK_DO_APPS_SCRIPT_AQUI') {
+        text.textContent = 'Planilha Conectada';
+      } else {
+        text.textContent = 'Salvando localmente';
+      }
+    }
 
     function recalcularNumeracaoTopicos() {
       const secoesVisiveis = document.querySelectorAll('section.secao-formulario:not(.hidden)');
@@ -1381,11 +1407,49 @@
       });
     }
 
+    function updateProjectUIState() {
+      const tbody = document.getElementById('projectsTableBody');
+      const rows = tbody.querySelectorAll('tr.project-row');
+      const count = rows.length;
+      
+      rows.forEach((r, idx) => {
+        const idxCell = r.querySelector('.row-idx');
+        if (idxCell) idxCell.textContent = idx + 1;
+      });
+
+      const badge = document.getElementById('projectCounterBadge');
+      if (badge) {
+        badge.textContent = `${count}/${MAX_PROJECTS}`;
+        badge.className = count >= MAX_PROJECTS 
+          ? "bg-amber-600 text-white rounded-full px-1.5 py-0.2 text-[10px] font-bold ml-1"
+          : "bg-sky-600 text-white rounded-full px-1.5 py-0.2 text-[10px] font-bold ml-1";
+      }
+
+      const btnAdd = document.getElementById('btnAddProject');
+      if (btnAdd) {
+        if (count >= MAX_PROJECTS) {
+          btnAdd.classList.add('opacity-50', 'cursor-not-allowed');
+          btnAdd.title = "Limite máximo de 5 projetos atingido";
+        } else {
+          btnAdd.classList.remove('opacity-50', 'cursor-not-allowed');
+          btnAdd.title = "Adicionar Projeto";
+        }
+      }
+    }
+
     function addProjectRow(data = {}) {
       const tbody = document.getElementById('projectsTableBody');
+      const rows = tbody.querySelectorAll('tr.project-row');
+
+      if (rows.length >= MAX_PROJECTS) {
+        showToast('Limite máximo de 5 projetos atingido para padronização da planilha.', 'warning');
+        return;
+      }
+
       const tr = document.createElement('tr');
       tr.className = 'project-row';
       tr.innerHTML = `
+        <td class="py-1.5 px-2 text-center font-bold text-slate-500 row-idx">${rows.length + 1}</td>
         <td class="py-1.5 px-2"><input type="text" name="proj_objeto[]" value="${data.objeto || ''}" placeholder="Ex: Ampliação de ETA / Esgoto" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
         <td class="py-1.5 px-2"><input type="text" name="proj_situacao[]" value="${data.situacao || ''}" placeholder="Ex: Projeto básico / Executivo" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
         <td class="py-1.5 px-2"><input type="text" name="proj_valor[]" value="${data.valor || ''}" placeholder="Ex: R$ 3,5M - PAC / MCID" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
@@ -1395,6 +1459,7 @@
         </td>
       `;
       tbody.appendChild(tr);
+      updateProjectUIState();
       saveCurrentDraft();
     }
 
@@ -1403,6 +1468,7 @@
       const tbody = document.getElementById('projectsTableBody');
       if (tbody.querySelectorAll('tr').length > 1) {
         row.remove();
+        updateProjectUIState();
         saveCurrentDraft();
       } else {
         showToast('Mantenha ao menos uma linha de projeto.', 'warning');
@@ -1421,7 +1487,7 @@
           projects.push({ objeto: obj, situacao: sit, valor: val, impedimento: imp });
         }
       });
-      return projects;
+      return projects.slice(0, MAX_PROJECTS);
     }
 
     function populateProjectsData(projects) {
@@ -1431,7 +1497,9 @@
         addProjectRow();
         return;
       }
-      projects.forEach(p => addProjectRow(p));
+      const toLoad = projects.slice(0, MAX_PROJECTS);
+      toLoad.forEach(p => addProjectRow(p));
+      updateProjectUIState();
     }
 
     function handleTriageChange() {
@@ -1612,7 +1680,123 @@
       if (txt) txt.textContent = `${pct}%`;
     }
 
-    function finalizeInterview() {
+    // GERA OBJETO PLANIFICADO COM EXATAMENTE OS CABEÇALHOS DA PLANILHA
+    function buildSpreadsheetPayload(record) {
+      const projs = Array.isArray(record.projetos_pac) ? record.projetos_pac : [];
+      const p1 = projs[0] || {};
+      const p2 = projs[1] || {};
+      const p3 = projs[2] || {};
+      const p4 = projs[3] || {};
+      const p5 = projs[4] || {};
+
+      return {
+        'ID_Escuta': record.id || '',
+        'Data_Hora_Registro': record.createdAt || '',
+        'Data_Escuta': record.b1_data || '',
+        'Municipio': record.b1_municipio || '',
+        'UF': record.b1_uf || '',
+        'Porte_Populacional': record.b1_porte || '',
+        'Nome_Participante': record.b1_nome || '',
+        'Cargo_Funcao': record.b1_cargo || '',
+        'Orgao_Secretaria': record.b1_orgao || '',
+        'Perfil_Participacao': record.b1_participacao || '',
+        'WhatsApp': record.b1_whatsapp || '',
+        'Email': record.b1_email || '',
+        'Agua_Titular': record.b2_inst_agua_titular || '',
+        'Agua_Prestador': record.b2_inst_agua_prestador || '',
+        'Agua_Regulacao': record.b2_inst_agua_regulacao || '',
+        'Esgoto_Titular': record.b2_inst_esgoto_titular || '',
+        'Esgoto_Prestador': record.b2_inst_esgoto_prestador || '',
+        'Esgoto_Regulacao': record.b2_inst_esgoto_regulacao || '',
+        'Residuos_Titular': record.b2_inst_residuos_titular || '',
+        'Residuos_Prestador': record.b2_inst_residuos_prestador || '',
+        'Residuos_Regulacao': record.b2_inst_residuos_regulacao || '',
+        'Drenagem_Titular': record.b2_inst_drenagem_titular || '',
+        'Drenagem_Prestador': record.b2_inst_drenagem_prestador || '',
+        'Drenagem_Regulacao': record.b2_inst_drenagem_regulacao || '',
+        'Eixos_Triagem_Gargalos': Array.isArray(record.triage_eixos) ? record.triage_eixos.join(', ') : (record.triage_eixos || ''),
+        'Agua_Cadeia_Afetada': Array.isArray(record.b3_agua_cadeia) ? record.b3_agua_cadeia.join(', ') : (record.b3_agua_cadeia || ''),
+        'Agua_Mesma_Inst_Produz_Distribui': record.b3_agua_mesma_inst || '',
+        'Agua_Fonte_Principal': record.b3_agua_fonte || '',
+        'Agua_Divisao_Obs': record.b3_agua_divisao_obs || '',
+        'Agua_Gargalos_Checklist': Array.isArray(record.b3_agua_gargalos) ? record.b3_agua_gargalos.join(', ') : (record.b3_agua_gargalos || ''),
+        'Agua_Descricao_Dor': record.b3_agua_dor || '',
+        'Esgoto_Cadeia_Afetada': Array.isArray(record.b4_esgoto_cadeia) ? record.b4_esgoto_cadeia.join(', ') : (record.b4_esgoto_cadeia || ''),
+        'Esgoto_Situacao_Cobertura': record.b4_esgoto_situacao || '',
+        'Esgoto_Sistemas_Individuais_Fossas': record.b4_esgoto_descentralizado || '',
+        'Esgoto_Gargalos_Checklist': Array.isArray(record.b4_esgoto_gargalos) ? record.b4_esgoto_gargalos.join(', ') : (record.b4_esgoto_gargalos || ''),
+        'Esgoto_Descricao_Dor': record.b4_esgoto_dor || '',
+        'Residuos_Cobranca_Status': record.b5_res_cobranca_status || '',
+        'Residuos_Destinacao_Final': record.b5_res_destinacao_status || '',
+        'Residuos_Frota_Status': record.b5_res_frota_status || '',
+        'Residuos_Catadores_Cooperativa': record.b5_res_catadores_status || '',
+        'Residuos_Gargalos_Checklist': Array.isArray(record.b5_res_gargalos) ? record.b5_res_gargalos.join(', ') : (record.b5_res_gargalos || ''),
+        'Residuos_Descricao_Dor': record.b5_res_dor || '',
+        'Drenagem_Equipe_Tecnica': record.b6_dren_equipe || '',
+        'Drenagem_Cadastro_Rede': record.b6_dren_cadastro || '',
+        'Drenagem_Gravidade_Alagamentos': record.b6_dren_alagamentos || '',
+        'Drenagem_Pontos_Criticos_Locais': record.b6_dren_localidades || '',
+        'Drenagem_Gargalos_Checklist': Array.isArray(record.b6_dren_gargalos) ? record.b6_dren_gargalos.join(', ') : (record.b6_dren_gargalos || ''),
+        'Drenagem_Descricao_Dor': record.b6_dren_dor || '',
+        'PMSB_Situacao': record.b7_pmsb_status || '',
+        'PMSB_Orienta_Investimentos': record.b7_pmsb_orienta || '',
+        'PMSB_Obstaculos_Travas': Array.isArray(record.b7_pmsb_obstaculos) ? record.b7_pmsb_obstaculos.join(', ') : (record.b7_pmsb_obstaculos || ''),
+        'NovoPAC_Resultado': record.b8_pac_experiencia || '',
+        'NovoPAC_Motivo_Inabilitacao': record.b8_pac_motivo_principal || '',
+        'PAC_P1_Objeto': p1.objeto || '',
+        'PAC_P1_Situacao': p1.situacao || '',
+        'PAC_P1_Valor': p1.valor || '',
+        'PAC_P1_Impedimento': p1.impedimento || '',
+        'PAC_P2_Objeto': p2.objeto || '',
+        'PAC_P2_Situacao': p2.situacao || '',
+        'PAC_P2_Valor': p2.valor || '',
+        'PAC_P2_Impedimento': p2.impedimento || '',
+        'PAC_P3_Objeto': p3.objeto || '',
+        'PAC_P3_Situacao': p3.situacao || '',
+        'PAC_P3_Valor': p3.valor || '',
+        'PAC_P3_Impedimento': p3.impedimento || '',
+        'PAC_P4_Objeto': p4.objeto || '',
+        'PAC_P4_Situacao': p4.situacao || '',
+        'PAC_P4_Valor': p4.valor || '',
+        'PAC_P4_Impedimento': p4.impedimento || '',
+        'PAC_P5_Objeto': p5.objeto || '',
+        'PAC_P5_Situacao': p5.situacao || '',
+        'PAC_P5_Valor': p5.valor || '',
+        'PAC_P5_Impedimento': p5.impedimento || '',
+        'Apoio_Tipos_Demandados': Array.isArray(record.b11_apoio_tipos) ? record.b11_apoio_tipos.join(', ') : (record.b11_apoio_tipos || ''),
+        'Acao_Urgente_12_Meses': record.b11_problema_12meses || '',
+        'Recado_Ministerio_Cidades': record.b11_desabafo_ministerio || '',
+        'Nome_Entrevistador': record.b12_nome_entrevistador || '',
+        'Entrevistador_Observacoes': record.b12_obs_entrevistador || '',
+        'Entrevistador_Indicar_Aprofundamento': record.b12_aprofundamento || '',
+        'Entrevistador_Necessita_Especialista': record.b12_analise_especialista || '',
+        'Entrevistador_Tema_Capacitacao': record.b12_tema_capacitacao || ''
+      };
+    }
+
+    async function sendToGoogleSheets(payload) {
+      if (!GOOGLE_SHEETS_WEB_APP_URL || GOOGLE_SHEETS_WEB_APP_URL === 'COLE_SEU_LINK_DO_APPS_SCRIPT_AQUI') {
+        console.log('Google Sheets Web App URL não configurada. Salvamento apenas local.');
+        return false;
+      }
+
+      try {
+        await fetch(GOOGLE_SHEETS_WEB_APP_URL, {
+          method: 'POST',
+          mode: 'no-cors', // Permite envio direto sem problemas de CORS
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+        return true;
+      } catch (err) {
+        console.warn('Falha no envio para Google Sheets:', err);
+        return false;
+      }
+    }
+
+    async function finalizeInterview() {
       const data = serializeFormData();
 
       if (!data.b1_municipio || !data.b1_uf || !data.b1_nome || !data.b1_cargo || !data.b1_porte || !data.b1_whatsapp || !data.b1_email) {
@@ -1633,6 +1817,10 @@
         return;
       }
 
+      const btn = document.getElementById('btnFinalize');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin mr-2">⏳</span> Gravando...`;
+
       const now = new Date();
       const dateStr = now.toISOString().slice(0,10).replace(/-/g, '');
       const ufClean = (data.b1_uf || 'BR').toUpperCase();
@@ -1645,10 +1833,16 @@
         ...data
       };
 
+      // 1. Salva no banco local
       const list = getStoredInterviews();
       list.unshift(record);
       saveStoredInterviews(list);
 
+      // 2. Dispara envio assíncrono para o Google Sheets (Apps Script)
+      const payload = buildSpreadsheetPayload(record);
+      const cloudSuccess = await sendToGoogleSheets(payload);
+
+      // Reseta formulário
       localStorage.removeItem(STORAGE_KEY_DRAFT);
       document.getElementById('saneaForm').reset();
       populateProjectsData([]);
@@ -1663,8 +1857,23 @@
       updateProgressBar();
       updateSavedCountBadge();
 
+      btn.disabled = false;
+      btn.innerHTML = `
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+        <span>Finalizar e Gravar Escuta</span>
+      `;
+
       const banner = document.getElementById('recoveredDraftBanner');
       if (banner) banner.classList.add('hidden');
+
+      const notice = document.getElementById('successSyncNotice');
+      if (notice) {
+        if (cloudSuccess) {
+          notice.textContent = 'Salva no dispositivo e enviada para a aba "Respostas" no Google Sheets.';
+        } else {
+          notice.textContent = 'Salva com sucesso no armazenamento local deste dispositivo.';
+        }
+      }
 
       showSuccessModal(record);
     }
@@ -1712,13 +1921,6 @@
 
     function formatCSVField(val) {
       if (val === null || val === undefined) return '""';
-      if (Array.isArray(val)) {
-        if (val.length > 0 && typeof val[0] === 'object') {
-          val = val.map((p, idx) => `[${idx+1}] Objeto: ${p.objeto || '-'} | Situação: ${p.situacao || '-'} | Valor: ${p.valor || '-'} | Trava: ${p.impedimento || '-'}`).join(' // ');
-        } else {
-          val = val.join(', ');
-        }
-      }
       val = String(val).trim();
       val = val.replace(/\r?\n|\r/g, ' / ');
       val = val.replace(/"/g, '""');
@@ -1726,59 +1928,12 @@
     }
 
     function getCSVHeaders() {
-      return [
-        'ID_Escuta', 'Data_Hora_Registro', 'Data_Escuta', 'Municipio', 'UF', 'Porte_Populacional',
-        'Nome_Participante', 'Cargo_Funcao', 'Orgao_Secretaria', 'Perfil_Participacao', 'WhatsApp', 'Email',
-        'Agua_Titular', 'Agua_Prestador', 'Agua_Regulacao',
-        'Esgoto_Titular', 'Esgoto_Prestador', 'Esgoto_Regulacao',
-        'Residuos_Titular', 'Residuos_Prestador', 'Residuos_Regulacao',
-        'Drenagem_Titular', 'Drenagem_Prestador', 'Drenagem_Regulacao',
-        'Eixos_Triagem_Gargalos',
-        // Água
-        'Agua_Cadeia_Afetada', 'Agua_Mesma_Inst_Produz_Distribui', 'Agua_Fonte_Principal', 'Agua_Divisao_Obs', 'Agua_Gargalos_Checklist', 'Agua_Descricao_Dor',
-        // Esgoto
-        'Esgoto_Cadeia_Afetada', 'Esgoto_Situacao_Cobertura', 'Esgoto_Sistemas_Individuais_Fossas', 'Esgoto_Gargalos_Checklist', 'Esgoto_Descricao_Dor',
-        // Resíduos
-        'Residuos_Cobranca_Status', 'Residuos_Destinacao_Final', 'Residuos_Frota_Status', 'Residuos_Catadores_Cooperativa', 'Residuos_Gargalos_Checklist', 'Residuos_Descricao_Dor',
-        // Drenagem
-        'Drenagem_Equipe_Tecnica', 'Drenagem_Cadastro_Rede', 'Drenagem_Gravidade_Alagamentos', 'Drenagem_Pontos_Criticos_Locais', 'Drenagem_Gargalos_Checklist', 'Drenagem_Descricao_Dor',
-        // PMSB & PAC
-        'PMSB_Situacao', 'PMSB_Orienta_Investimentos', 'PMSB_Obstaculos_Travas',
-        'Projetos_Investimentos_Detalhes', 'NovoPAC_Resultado', 'NovoPAC_Motivo_Inabilitacao',
-        // Apoio
-        'Apoio_Tipos_Demandados', 'Acao_Urgente_12_Meses', 'Recado_Ministerio_Cidades',
-        // Entrevistador
-        'Nome_Entrevistador', 'Entrevistador_Observacoes', 'Entrevistador_Indicar_Aprofundamento', 'Entrevistador_Necessita_Especialista', 'Entrevistador_Tema_Capacitacao'
-      ];
+      return Object.keys(buildSpreadsheetPayload({}));
     }
 
     function convertRecordToCSVRow(rec) {
-      const row = [
-        rec.id || '', rec.createdAt || '', rec.b1_data || '', rec.b1_municipio || '', rec.b1_uf || '', rec.b1_porte || '',
-        rec.b1_nome || '', rec.b1_cargo || '', rec.b1_orgao || '', rec.b1_participacao || '', rec.b1_whatsapp || '', rec.b1_email || '',
-        rec.b2_inst_agua_titular || '', rec.b2_inst_agua_prestador || '', rec.b2_inst_agua_regulacao || '',
-        rec.b2_inst_esgoto_titular || '', rec.b2_inst_esgoto_prestador || '', rec.b2_inst_esgoto_regulacao || '',
-        rec.b2_inst_residuos_titular || '', rec.b2_inst_residuos_prestador || '', rec.b2_inst_residuos_regulacao || '',
-        rec.b2_inst_drenagem_titular || '', rec.b2_inst_drenagem_prestador || '', rec.b2_inst_drenagem_regulacao || '',
-        rec.triage_eixos || '',
-        // Água
-        rec.b3_agua_cadeia || '', rec.b3_agua_mesma_inst || '', rec.b3_agua_fonte || '', rec.b3_agua_divisao_obs || '', rec.b3_agua_gargalos || '', rec.b3_agua_dor || '',
-        // Esgoto
-        rec.b4_esgoto_cadeia || '', rec.b4_esgoto_situacao || '', rec.b4_esgoto_descentralizado || '', rec.b4_esgoto_gargalos || '', rec.b4_esgoto_dor || '',
-        // Resíduos
-        rec.b5_res_cobranca_status || '', rec.b5_res_destinacao_status || '', rec.b5_res_frota_status || '', rec.b5_res_catadores_status || '', rec.b5_res_gargalos || '', rec.b5_res_dor || '',
-        // Drenagem
-        rec.b6_dren_equipe || '', rec.b6_dren_cadastro || '', rec.b6_dren_alagamentos || '', rec.b6_dren_localidades || '', rec.b6_dren_gargalos || '', rec.b6_dren_dor || '',
-        // PMSB & PAC
-        rec.b7_pmsb_status || '', rec.b7_pmsb_orienta || '', rec.b7_pmsb_obstaculos || '',
-        rec.projetos_pac || '', rec.b8_pac_experiencia || '', rec.b8_pac_motivo_principal || '',
-        // Apoio
-        rec.b11_apoio_tipos || '', rec.b11_problema_12meses || '', rec.b11_desabafo_ministerio || '',
-        // Entrevistador
-        rec.b12_nome_entrevistador || '', rec.b12_obs_entrevistador || '', rec.b12_aprofundamento || '', rec.b12_analise_especialista || '', rec.b12_tema_capacitacao || ''
-      ];
-
-      return row.map(formatCSVField).join(';');
+      const payload = buildSpreadsheetPayload(rec);
+      return Object.values(payload).map(formatCSVField).join(';');
     }
 
     function downloadFile(content, fileName, mimeType) {
