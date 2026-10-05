@@ -64,7 +64,6 @@
   <header class="sticky top-0 z-40 bg-[#aee2f5] text-slate-900 shadow-md border-b border-sky-300 no-print">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
       <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-        
         <!-- Status de salvamento e recuperação -->
         <div class="flex items-center gap-3 text-xs w-full sm:w-auto">
           <div id="saveStatusIndicator" class="flex items-center gap-1.5 bg-white/80 px-3 py-1 rounded-lg border border-sky-300/80 text-sky-950 font-medium shadow-sm backdrop-blur-sm">
@@ -333,7 +332,7 @@
                     <input type="checkbox" id="triage_agua" name="triage_eixos" value="Agua" checked onchange="handleTriageChange()" class="custom-checkbox">
                     <span class="text-xs font-semibold text-slate-800">Abastecimento de Água</span>
                   </label>
-                  <label class="flex items-center gap-2.5 p-2.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/40">
+                  <label class="flex items-center gap-2.5 p-2.5 bg-white rounded-lg border border-amber-800/40 cursor-pointer hover:border-amber-800 hover:bg-amber-900/10">
                     <input type="checkbox" id="triage_esgoto" name="triage_eixos" value="Esgoto" checked onchange="handleTriageChange()" class="custom-checkbox">
                     <span class="text-xs font-semibold text-slate-800">Esgotamento Sanitário</span>
                   </label>
@@ -483,12 +482,12 @@
         </aside>
       </div>
 
-      <!-- TÓPICO CONDICIONAL: ESGOTO -->
+      <!-- TÓPICO CONDICIONAL: ESGOTO (MARROM / PLANSAB) -->
       <div id="row_esgoto" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        <section id="bloco4_esgoto" class="secao-formulario lg:col-span-8 bg-white rounded-2xl p-5 sm:p-7 shadow-sm border-2 border-emerald-200" data-base-title="Ficha de Escuta: Esgotamento Sanitário">
-          <div class="flex items-center justify-between border-b border-emerald-100 pb-3 mb-4">
+        <section id="bloco4_esgoto" class="secao-formulario lg:col-span-8 bg-white rounded-2xl p-5 sm:p-7 shadow-sm border-2 border-amber-900/30" data-base-title="Ficha de Escuta: Esgotamento Sanitário">
+          <div class="flex items-center justify-between border-b border-amber-900/20 pb-3 mb-4">
             <div class="flex items-center gap-3">
-              <span class="secao-badge w-8 h-8 rounded-xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center shadow">4</span>
+              <span class="secao-badge w-8 h-8 rounded-xl bg-amber-900 text-white font-black text-sm flex items-center justify-center shadow">4</span>
               <div>
                 <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">Ficha de Escuta: Esgotamento Sanitário</h3>
                 <p class="text-xs text-slate-500">Diagnóstico da rede, elevatórias, estações e soluções individuais</p>
@@ -501,16 +500,16 @@
             <div>
               <label class="block font-bold text-slate-700 uppercase tracking-wider mb-2">Etapas críticas onde se concentram os problemas:</label>
               <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-emerald-50 cursor-pointer">
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-amber-900/10 cursor-pointer">
                   <input type="checkbox" name="b4_esgoto_cadeia" value="Rede_Coleta" class="custom-checkbox"> <span>Coleta / Rede</span>
                 </label>
-                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-emerald-50 cursor-pointer">
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-amber-900/10 cursor-pointer">
                   <input type="checkbox" name="b4_esgoto_cadeia" value="Elevatorias_EEE" class="custom-checkbox"> <span>Elevatórias (EEE)</span>
                 </label>
-                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-emerald-50 cursor-pointer">
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-amber-900/10 cursor-pointer">
                   <input type="checkbox" name="b4_esgoto_cadeia" value="Tratamento_ETE" class="custom-checkbox"> <span>Tratamento (ETE)</span>
                 </label>
-                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-emerald-50 cursor-pointer">
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-amber-900/10 cursor-pointer">
                   <input type="checkbox" name="b4_esgoto_cadeia" value="Disposicao_Final" class="custom-checkbox"> <span>Disposição / Emissário</span>
                 </label>
               </div>
@@ -575,27 +574,27 @@
           </div>
         </section>
 
-        <!-- BLOCO LATERAL DE FORA -->
-        <aside class="lg:col-span-4 bg-white p-4 rounded-2xl border border-emerald-200 shadow-sm text-xs space-y-3">
-          <div class="flex items-center gap-2 pb-2 border-b border-emerald-100">
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <h4 class="font-bold text-emerald-950 uppercase tracking-wider text-[11px]">Termos — Esgotamento</h4>
+        <!-- BLOCO LATERAL DE FORA (MARROM / PLANSAB) -->
+        <aside class="lg:col-span-4 bg-white p-4 rounded-2xl border border-amber-900/30 shadow-sm text-xs space-y-3">
+          <div class="flex items-center gap-2 pb-2 border-b border-amber-900/20">
+            <span class="w-2 h-2 rounded-full bg-amber-900"></span>
+            <h4 class="font-bold text-amber-950 uppercase tracking-wider text-[11px]">Termos — Esgotamento</h4>
           </div>
           <div class="space-y-2.5 text-[11px] text-slate-600 leading-relaxed">
             <div>
-              <strong class="text-emerald-900 block">Coleta / Rede Coletora:</strong>
+              <strong class="text-amber-950 block">Coleta / Rede Coletora:</strong>
               Conjunto de tubulações que recebe os efluentes sanitários dos imóveis e os transporta por gravidade até os coletores e elevatórias.
             </div>
             <div>
-              <strong class="text-emerald-900 block">EEE (Estação Elevatória de Esgoto):</strong>
+              <strong class="text-amber-950 block">EEE (Estação Elevatória de Esgoto):</strong>
               Instalação com bombas que eleva o esgoto de pontos baixos para pontos mais altos quando o terreno não tem caimento natural.
             </div>
             <div>
-              <strong class="text-emerald-900 block">ETE (Estação de Tratamento de Esgoto):</strong>
+              <strong class="text-amber-950 block">ETE (Estação de Tratamento de Esgoto):</strong>
               Unidade com processos físicos e biológicos para despoluir a água antes de devolvê-la aos rios ou mananciais.
             </div>
             <div>
-              <strong class="text-emerald-900 block">Disposição Final / Emissário:</strong>
+              <strong class="text-amber-950 block">Disposição Final / Emissário:</strong>
               Canalização que transporta o efluente tratado até o ponto de descarte seguro e licenciado no corpo hídrico.
             </div>
           </div>
@@ -673,7 +672,7 @@
                   <input type="checkbox" name="b5_res_gargalos" value="Frete / distancia aterro" class="custom-checkbox"> <span>Distância e frete inviável</span>
                 </label>
                 <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
-                  <input type="checkbox" name="b5_res_gargalos" value="Frota insuficiente" class="custom-checkbox"> <span">Frota insuficiente/quebras</span>
+                  <input type="checkbox" name="b5_res_gargalos" value="Frota insuficiente" class="custom-checkbox"> <span>Frota insuficiente/quebras</span>
                 </label>
                 <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
                   <input type="checkbox" name="b5_res_gargalos" value="Custo consome orcamento" class="custom-checkbox"> <span>Custo asfixia o orçamento</span>
@@ -800,7 +799,7 @@
                 <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
                   <input type="checkbox" name="b6_dren_gargalos" value="Sem plano de contingencia" class="custom-checkbox"> <span>Defesa Civil sem plano/alerta</span>
                 </label>
-                <label class="flex items-checkbox gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
                   <input type="checkbox" name="b6_dren_gargalos" value="Outro" class="custom-checkbox"> <span>Outro</span>
                 </label>
               </div>
@@ -937,13 +936,54 @@
               <span class="secao-badge w-8 h-8 rounded-xl bg-purple-100 text-purple-800 font-black text-sm flex items-center justify-center border border-purple-200 shadow-sm">8</span>
               <div>
                 <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">Investimentos e Novo PAC</h3>
-                <p class="text-xs text-slate-500">Acesso a recursos federais e carteira de projetos pretendidos ou contratados</p>
+                <p class="text-xs text-slate-500">Diagnóstico de adesão, interesse em novas seleções e direcionamento de propostas</p>
               </div>
             </div>
             <span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Obrigatório</span>
           </div>
 
           <div class="space-y-5 text-xs">
+            
+            <!-- PARTE 1: SE JÁ FOI CONTEMPLADO E SE GOSTARIA DE SER CONTEMPLADO (COMO?) -->
+            <div class="p-4 bg-purple-50/70 rounded-xl border border-purple-200 space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="b8_pac_contemplado" class="block font-bold text-slate-800 uppercase tracking-wider mb-1">
+                    1. O município já foi contemplado no Novo PAC? <span class="text-red-500">*</span>
+                  </label>
+                  <select id="b8_pac_contemplado" name="b8_pac_contemplado" required class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
+                    <option value="">Selecione...</option>
+                    <option value="Sim_Totalmente">Sim, com propostas selecionadas e contratadas</option>
+                    <option value="Sim_Em_Contratacao">Sim, selecionado (aguardando/formalizando contrato)</option>
+                    <option value="Nao_Inabilitado">Não, cadastrou proposta mas não foi contemplado/inabilitado</option>
+                    <option value="Nao_Participou">Não participou das seleções anteriores</option>
+                    <option value="Nao_Sabe">Não sabe informar</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="b8_pac_gostaria" class="block font-bold text-slate-800 uppercase tracking-wider mb-1">
+                    2. Gostaria de ser contemplado em novas seleções? <span class="text-red-500">*</span>
+                  </label>
+                  <select id="b8_pac_gostaria" name="b8_pac_gostaria" required class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
+                    <option value="">Selecione o interesse...</option>
+                    <option value="Sim_Prioridade_Maxima">Sim, é prioridade máxima da gestão atual</option>
+                    <option value="Sim_Com_Apoio_Tecnico">Sim, desde que com apoio técnico para elaborar projetos</option>
+                    <option value="A_Avaliar">A avaliar conforme linhas de financiamento/contrapartida</option>
+                    <option value="Nao">Não no momento atual</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label for="b8_pac_como_gostaria" class="block font-bold text-slate-800 uppercase tracking-wider mb-1">
+                  Como gostaria de ser contemplado? (Quais tipos de obra, eixo ou apoio para direcionar nossas propostas?):
+                </label>
+                <textarea id="b8_pac_como_gostaria" name="b8_pac_como_gostaria" rows="2" placeholder="Ex: Gostaríamos de ser contemplados com expansão da rede de esgoto na sede, projeto padrão para transbordo de resíduos e elaboração de projeto executivo para macrodrenagem..." class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800"></textarea>
+              </div>
+            </div>
+
+            <!-- PARTE 2: CARTEIRA DE ATÉ 5 PROJETOS PRIORITÁRIOS -->
             <div>
               <div class="flex items-center justify-between mb-2">
                 <label class="block font-bold text-slate-700 uppercase tracking-wider">
@@ -994,12 +1034,13 @@
               </div>
             </div>
 
+            <!-- PARTE 3: HISTÓRICO RECENTE E MOTIVOS DE TRAVA -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
               <div>
                 <label for="b8_pac_experiencia" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Resultado recente no Novo PAC: <span class="text-red-500">*</span>
+                  Resultado recente nas seleções do Novo PAC:
                 </label>
-                <select id="b8_pac_experiencia" name="b8_pac_experiencia" required class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+                <select id="b8_pac_experiencia" name="b8_pac_experiencia" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
                   <option value="">Selecione...</option>
                   <option value="Aprovado/selecionado">Aprovado / Selecionado com proposta</option>
                   <option value="Cadastrado e reprovado/inabilitado">Cadastrou proposta, mas foi Inabilitado/Reprovado</option>
@@ -1024,6 +1065,7 @@
                 </select>
               </div>
             </div>
+
           </div>
         </section>
 
@@ -1177,10 +1219,6 @@
           <p class="text-xs text-slate-500">Salva no banco local deste dispositivo, na planilha online do Google Sheets e reinicia a tela.</p>
         </div>
         <div class="flex items-center flex-wrap gap-3 w-full sm:w-auto">
-          <button type="button" onclick="confirmResetDraft()" class="px-4 py-2.5 text-xs font-semibold text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl border border-slate-200 transition">
-            Limpar Rascunho
-          </button>
-
           <button type="button" onclick="exportCurrentToCSV()" class="px-4 py-2.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl border border-slate-300 transition flex items-center gap-1.5 shadow-sm">
             <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
             <span>Baixar CSV Desta Escuta</span>
@@ -1207,13 +1245,11 @@
         <button type="button" onclick="exportBackupJSON()" class="hover:text-white underline cursor-pointer">Backup JSON</button>
         <span>•</span>
         <button type="button" onclick="openImportJSONModal()" class="hover:text-white underline cursor-pointer">Mesclar JSON</button>
-        <span>•</span>
-        <button type="button" onclick="openResetAllModal()" class="text-red-400 hover:text-red-300 underline cursor-pointer">Limpar Banco</button>
       </div>
     </div>
   </footer>
 
-  <!-- MODAIS (HISTÓRICO, SUCESSO, RESET, IMPORTAR) -->
+  <!-- MODAIS (HISTÓRICO, SUCESSO, IMPORTAR) -->
   <div id="modalHistory" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
     <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl border border-slate-200 flex flex-col max-h-[90vh] overflow-hidden">
       <div class="p-4 sm:p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
@@ -1295,21 +1331,6 @@
     </div>
   </div>
 
-  <div id="modalResetAll" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
-    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 border border-slate-200">
-      <h3 class="text-base font-bold text-slate-900 mb-1">Atenção: Limpeza Completa</h3>
-      <p class="text-xs text-slate-600 mb-4">Esta ação apagará todas as escutas salvas neste computador.</p>
-      <div class="mb-4">
-        <label for="resetConfirmText" class="block text-xs font-bold text-slate-700 mb-1">Digite <span class="text-red-600 font-black">LIMPAR</span>:</label>
-        <input type="text" id="resetConfirmText" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-sm text-center font-bold tracking-widest text-red-600 uppercase">
-      </div>
-      <div class="flex items-center gap-3">
-        <button type="button" onclick="closeResetAllModal()" class="flex-1 py-2 bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">Cancelar</button>
-        <button type="button" onclick="executeResetAll()" class="flex-1 py-2 bg-red-600 text-white rounded-lg text-xs font-bold">Apagar Tudo</button>
-      </div>
-    </div>
-  </div>
-
   <div id="modalImportJSON" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
     <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 border border-slate-200">
       <h3 class="text-base font-bold text-slate-900 mb-1">Mesclar Escutas via JSON</h3>
@@ -1343,23 +1364,12 @@
 
       handleTriageChange();
       loadDraftFromStorage();
-      updateSavedCountBadge();
       setupFormListeners();
       setInterval(updateSaveStatusIndicator, 5000);
       recalcularNumeracaoTopicos();
       updateProgressBar();
       updateProjectUIState();
-      verificarStatusNuvem();
     });
-
-    function verificarStatusNuvem() {
-      const text = document.getElementById('syncStatusText');
-      if (GOOGLE_SHEETS_WEB_APP_URL && GOOGLE_SHEETS_WEB_APP_URL !== 'COLE_SEU_LINK_DO_APPS_SCRIPT_AQUI') {
-        text.textContent = 'Planilha Conectada';
-      } else {
-        text.textContent = 'Salvando localmente';
-      }
-    }
 
     function recalcularNumeracaoTopicos() {
       const secoesVisiveis = document.querySelectorAll('section.secao-formulario:not(.hidden)');
@@ -1618,8 +1628,6 @@
           const data = JSON.parse(raw);
           if (data.b1_municipio || data.b1_nome || (data.triage_eixos && data.triage_eixos.length > 0)) {
             populateForm(data);
-            const banner = document.getElementById('recoveredDraftBanner');
-            if (banner) banner.classList.remove('hidden');
             showToast('Rascunho recuperado.', 'info');
           }
         }
@@ -1713,6 +1721,9 @@
         'PMSB_Situacao': record.b7_pmsb_status || '',
         'PMSB_Orienta_Investimentos': record.b7_pmsb_orienta || '',
         'PMSB_Obstaculos_Travas': Array.isArray(record.b7_pmsb_obstaculos) ? record.b7_pmsb_obstaculos.join(', ') : (record.b7_pmsb_obstaculos || ''),
+        'PAC_Contemplado_Status': record.b8_pac_contemplado || '',
+        'PAC_Gostaria_Contemplado': record.b8_pac_gostaria || '',
+        'PAC_Como_Gostaria_Apoio': record.b8_pac_como_gostaria || '',
         'NovoPAC_Resultado': record.b8_pac_experiencia || '',
         'NovoPAC_Motivo_Inabilitacao': record.b8_pac_motivo_principal || '',
         'PAC_P1_Objeto': p1.objeto || '',
@@ -1747,15 +1758,14 @@
     }
 
     async function sendToGoogleSheets(payload) {
-      if (!GOOGLE_SHEETS_WEB_APP_URL || GOOGLE_SHEETS_WEB_APP_URL === 'COLE_SEU_LINK_DO_APPS_SCRIPT_AQUI') {
-        console.log('Google Sheets Web App URL não configurada. Salvamento apenas local.');
+      if (!GOOGLE_SHEETS_WEB_APP_URL || GOOGLE_SHEETS_WEB_APP_URL.includes('COLE_SEU_LINK')) {
         return false;
       }
 
       try {
         await fetch(GOOGLE_SHEETS_WEB_APP_URL, {
           method: 'POST',
-          mode: 'no-cors', // Permite envio direto sem problemas de CORS
+          mode: 'no-cors',
           headers: {
             'Content-Type': 'application/json'
           },
@@ -1783,8 +1793,8 @@
         return;
       }
 
-      if (!data.b8_pac_experiencia) {
-        showToast('Informe o resultado no Novo PAC.', 'error');
+      if (!data.b8_pac_contemplado) {
+        showToast('Informe se o município já foi contemplado no PAC.', 'error');
         document.getElementById('bloco8_investimentos').scrollIntoView({ behavior: 'smooth' });
         return;
       }
@@ -1805,16 +1815,16 @@
         ...data
       };
 
-      // 1. Salva no banco local
+      // 1. Salva no banco local com ID imutável
       const list = getStoredInterviews();
       list.unshift(record);
       saveStoredInterviews(list);
 
-      // 2. Dispara envio assíncrono para o Google Sheets (Apps Script)
+      // 2. Dispara envio assíncrono para o Google Sheets (Apps Script adiciona nova linha ao fim)
       const payload = buildSpreadsheetPayload(record);
       const cloudSuccess = await sendToGoogleSheets(payload);
 
-      // Reseta formulário
+      // 3. LIMPEZA TOTAL IMEDIATA DO FORMULÁRIO PARA NÃO DEIXAR ALTERAR
       localStorage.removeItem(STORAGE_KEY_DRAFT);
       document.getElementById('saneaForm').reset();
       populateProjectsData([]);
@@ -1827,16 +1837,12 @@
       handleTriageChange();
       
       updateProgressBar();
-      updateSavedCountBadge();
 
       btn.disabled = false;
       btn.innerHTML = `
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
         <span>Finalizar e Gravar Escuta</span>
       `;
-
-      const banner = document.getElementById('recoveredDraftBanner');
-      if (banner) banner.classList.add('hidden');
 
       const notice = document.getElementById('successSyncNotice');
       if (notice) {
@@ -1864,30 +1870,6 @@
         localStorage.setItem(STORAGE_KEY_LIST, JSON.stringify(list));
       } catch (e) {
         showToast('Erro ao gravar no banco local.', 'error');
-      }
-    }
-
-    function updateSavedCountBadge() {
-      const list = getStoredInterviews();
-      const badge = document.getElementById('savedCountBadge');
-      if (badge) badge.textContent = list.length;
-    }
-
-    function confirmResetDraft() {
-      if (confirm('Deseja limpar todos os dados do rascunho em andamento?')) {
-        localStorage.removeItem(STORAGE_KEY_DRAFT);
-        document.getElementById('saneaForm').reset();
-        populateProjectsData([]);
-        document.getElementById('triage_agua').checked = true;
-        document.getElementById('triage_esgoto').checked = true;
-        document.getElementById('triage_residuos').checked = true;
-        document.getElementById('triage_drenagem').checked = true;
-        document.getElementById('triage_nenhum').checked = false;
-        handleTriageChange();
-        updateProgressBar();
-        const banner = document.getElementById('recoveredDraftBanner');
-        if (banner) banner.classList.add('hidden');
-        showToast('Rascunho limpo com sucesso.', 'info');
       }
     }
 
@@ -2025,33 +2007,14 @@
           </td>
           <td class="py-2.5 px-3 text-center">
             <div class="flex items-center justify-center gap-1.5">
-              <button type="button" onclick="loadInterviewToForm('${rec.id}')" title="Carregar no formulário" class="p-1 text-blue-600 hover:bg-blue-50 rounded">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-              </button>
               <button type="button" onclick="downloadSingleCSV('${rec.id}')" title="Baixar CSV" class="p-1 text-emerald-600 hover:bg-emerald-50 rounded">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-              </button>
-              <button type="button" onclick="deleteInterview('${rec.id}')" title="Excluir" class="p-1 text-red-500 hover:bg-red-50 rounded">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
               </button>
             </div>
           </td>
         `;
         tbody.appendChild(tr);
       });
-    }
-
-    function loadInterviewToForm(id) {
-      const list = getStoredInterviews();
-      const rec = list.find(r => r.id === id);
-      if (!rec) return;
-
-      if (confirm(`Carregar a escuta de ${rec.b1_municipio}? As alterações não salvas serão substituídas.`)) {
-        populateForm(rec);
-        closeHistoryModal();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        showToast(`Escuta ${rec.id} carregada.`, 'info');
-      }
     }
 
     function downloadSingleCSV(id) {
@@ -2070,17 +2033,6 @@
       downloadFile(csvContent, filename, 'text/csv;charset=utf-8;');
     }
 
-    function deleteInterview(id) {
-      if (confirm('Deseja realmente remover esta escuta do banco local?')) {
-        let list = getStoredInterviews();
-        list = list.filter(r => r.id !== id);
-        saveStoredInterviews(list);
-        renderHistoryTable();
-        updateSavedCountBadge();
-        showToast('Escuta removida do banco.', 'info');
-      }
-    }
-
     function showSuccessModal(rec) {
       document.getElementById('successModalId').textContent = rec.id;
       document.getElementById('successModalCity').textContent = `${rec.b1_municipio} - ${rec.b1_uf}`;
@@ -2097,38 +2049,6 @@
     function closeSuccessModal() {
       document.getElementById('modalSuccess').classList.add('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function openResetAllModal() {
-      document.getElementById('resetConfirmText').value = '';
-      document.getElementById('modalResetAll').classList.remove('hidden');
-    }
-
-    function closeResetAllModal() {
-      document.getElementById('modalResetAll').classList.add('hidden');
-    }
-
-    function executeResetAll() {
-      const text = document.getElementById('resetConfirmText').value.trim();
-      if (text !== 'LIMPAR') {
-        showToast('Digite LIMPAR para confirmar.', 'error');
-        return;
-      }
-
-      localStorage.removeItem(STORAGE_KEY_LIST);
-      localStorage.removeItem(STORAGE_KEY_DRAFT);
-      document.getElementById('saneaForm').reset();
-      populateProjectsData([]);
-      document.getElementById('triage_agua').checked = true;
-      document.getElementById('triage_esgoto').checked = true;
-      document.getElementById('triage_residuos').checked = true;
-      document.getElementById('triage_drenagem').checked = true;
-      document.getElementById('triage_nenhum').checked = false;
-      handleTriageChange();
-      updateProgressBar();
-      updateSavedCountBadge();
-      closeResetAllModal();
-      showToast('Banco local resetado.', 'info');
     }
 
     function openImportJSONModal() {
@@ -2169,7 +2089,6 @@
           });
 
           saveStoredInterviews(currentList);
-          updateSavedCountBadge();
           closeImportJSONModal();
           showToast(`${countAdded} novas escutas mescladas!`, 'success');
         } catch (err) {
