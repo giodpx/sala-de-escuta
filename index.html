@@ -1,0 +1,2090 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sala de Escuta | III SANEA BRASIL</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              200: '#bae0fd',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#1d4ed8',
+              800: '#1e3a8a',
+              900: '#0f172a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; font-size: 10pt; }
+    }
+    input[type="text"], input[type="date"], input[type="tel"], input[type="email"], select, textarea {
+      transition: all 0.2s ease-in-out;
+    }
+    input[type="text"]:focus, input[type="date"]:focus, input[type="tel"]:focus, input[type="email"]:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #0284c7;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.18);
+    }
+    .custom-checkbox {
+      accent-color: #0284c7;
+    }
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans">
+
+  <!-- TOAST DE NOTIFICAÇÃO FLUTUANTE -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- BARRA DE TOPO FIXA (HEADER COM FUNDO #aee2f5) -->
+  <header class="sticky top-0 z-40 bg-[#aee2f5] text-slate-900 shadow-md border-b border-sky-300 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+        
+        <!-- Status de salvamento e recuperação -->
+        <div class="flex items-center gap-3 text-xs w-full sm:w-auto">
+          <div id="saveStatusIndicator" class="flex items-center gap-1.5 bg-white/80 px-3 py-1 rounded-lg border border-sky-300/80 text-sky-950 font-medium shadow-sm backdrop-blur-sm">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+            </span>
+            <span id="saveStatusText">Salvamento ativo</span>
+          </div>
+
+          <div id="recoveredDraftBanner" class="hidden text-[10px] bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded font-semibold flex items-center gap-1 whitespace-nowrap shadow-sm">
+            Rascunho recuperado
+          </div>
+        </div>
+
+        <!-- Ações rápidas de exportação e histórico -->
+        <div class="flex items-center gap-2 text-xs w-full sm:w-auto justify-end">
+          <button type="button" onclick="openHistoryModal()" class="flex items-center gap-1.5 bg-white/90 hover:bg-white text-sky-950 px-3 py-1.5 rounded-lg border border-sky-300 transition font-semibold cursor-pointer shadow-sm">
+            <svg class="w-3.5 h-3.5 text-sky-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>Escutas:</span>
+            <span id="savedCountBadge" class="bg-sky-700 text-white font-bold px-1.5 py-0.2 rounded-full text-xs">0</span>
+          </button>
+
+          <button type="button" onclick="exportAllToCSV()" title="Exportar todas as escutas para CSV" class="flex items-center gap-1 bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1.5 rounded-lg transition font-semibold cursor-pointer shadow-sm">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>Exportar CSV</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Barra de progresso -->
+      <div class="mt-2 pt-1.5 border-t border-sky-300/70 flex items-center gap-3">
+        <div class="text-[11px] text-sky-950 font-medium whitespace-nowrap">Preenchimento: <strong id="progressPercentText" class="text-sky-900 font-extrabold">0%</strong></div>
+        <div class="w-full bg-sky-200/80 rounded-full h-1.5 overflow-hidden border border-sky-300/40">
+          <div id="formProgressBar" class="bg-sky-700 h-1.5 rounded-full transition-all duration-300 w-0"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ESPAÇO RESERVADO PARA O BANNER (1920px x 450px) -->
+  <div class="w-full max-w-[1920px] mx-auto bg-slate-200 no-print">
+    <div class="w-full aspect-[1920/450] max-h-[450px] overflow-hidden relative flex items-center justify-center bg-slate-200 border-b border-slate-300">
+      <img 
+        src="banner-sala-de-escuta.jpg" 
+        alt="Banner Sala de Escuta (1920x450)" 
+        onerror="this.style.display='none'; document.getElementById('banner-placeholder').style.display='flex';"
+        class="w-full h-full object-cover"
+      />
+      <div id="banner-placeholder" class="hidden absolute inset-0 flex flex-col items-center justify-center text-slate-500 bg-slate-200 border-dashed border-2 border-slate-300 m-2 rounded-xl">
+        <svg class="w-10 h-10 mb-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+        <span class="font-bold text-sm">Espaço Reservado para Imagem do Banner (1920px x 450px)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <div class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-8">
+
+    <!-- CABEÇALHO COM TÍTULO E SUBTÍTULO -->
+    <div class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200">
+      <div class="space-y-3">
+        <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
+          Sala de Escuta
+        </h1>
+        <p class="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
+          Um espaço de acolhimento qualificado para ouvir prefeitos, secretários e técnicos sobre os desafios reais da gestão de saneamento e viabilização de recursos no município. Seus relatos são consolidados para transformar demandas reais em inteligência, capacitação e apoio técnico ao setor.
+        </p>
+        <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-xs sm:text-sm text-slate-600 leading-relaxed mt-2">
+          <strong class="text-slate-800">Texto sugerido para o entrevistador ler ao participante:</strong>
+          <p class="italic mt-1 text-slate-500">"Este formulário não é uma auditoria nem fiscalização. Nosso objetivo é registrar a realidade prática do saneamento no seu município, entender onde a operação trava de verdade e mapear o que a União e as instituições de apoio técnico precisam fazer para destravar investimentos e projetos."</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORMULÁRIO -->
+    <form id="saneaForm" onsubmit="event.preventDefault();" class="space-y-8">
+
+      <!-- TÓPICO 1: IDENTIFICAÇÃO -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <section id="bloco1" class="secao-formulario lg:col-span-12 bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-slate-200" data-base-title="Identificação do Município e do Participante">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-5">
+            <div class="flex items-center gap-3">
+              <span class="secao-badge w-8 h-8 rounded-xl bg-blue-100 text-blue-800 font-black text-sm flex items-center justify-center border border-blue-200 shadow-sm">1</span>
+              <div>
+                <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">Identificação do Município e do Participante</h3>
+                <p class="text-xs text-slate-500">Dados do ente municipal e do gestor entrevistado</p>
+              </div>
+            </div>
+            <span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Obrigatório</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
+            <div>
+              <label for="b1_municipio" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Município <span class="text-red-500">*</span></label>
+              <input type="text" id="b1_municipio" name="b1_municipio" required placeholder="Ex: Petrolina" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800">
+            </div>
+            <div>
+              <label for="b1_uf" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">UF <span class="text-red-500">*</span></label>
+              <select id="b1_uf" name="b1_uf" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800">
+                <option value="">Selecione o Estado...</option>
+                <option value="AC">Acre (AC)</option><option value="AL">Alagoas (AL)</option><option value="AP">Amapá (AP)</option><option value="AM">Amazonas (AM)</option><option value="BA">Bahia (BA)</option><option value="CE">Ceará (CE)</option><option value="DF">Distrito Federal (DF)</option><option value="ES">Espírito Santo (ES)</option><option value="GO">Goiás (GO)</option><option value="MA">Maranhão (MA)</option><option value="MT">Mato Grosso (MT)</option><option value="MS">Mato Grosso do Sul (MS)</option><option value="MG">Minas Gerais (MG)</option><option value="PA">Pará (PA)</option><option value="PB">Paraíba (PB)</option><option value="PR">Paraná (PR)</option><option value="PE">Pernambuco (PE)</option><option value="PI">Piauí (PI)</option><option value="RJ">Rio de Janeiro (RJ)</option><option value="RN">Rio Grande do Norte (RN)</option><option value="RS">Rio Grande do Sul (RS)</option><option value="RO">Rondônia (RO)</option><option value="RR">Roraima (RR)</option><option value="SC">Santa Catarina (SC)</option><option value="SP">São Paulo (SP)</option><option value="SE">Sergipe (SE)</option><option value="TO">Tocantins (TO)</option>
+              </select>
+            </div>
+            <div>
+              <label for="b1_porte" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Porte Populacional <span class="text-red-500">*</span></label>
+              <select id="b1_porte" name="b1_porte" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800">
+                <option value="">Selecione a faixa...</option>
+                <option value="Ate_20k">Até 20.000 hab. (Pequeno I)</option>
+                <option value="20k_a_50k">20.001 a 50.000 hab. (Pequeno II)</option>
+                <option value="Acima_50k">Acima de 50.000 hab. (Médio/Grande)</option>
+              </select>
+            </div>
+            <div>
+              <label for="b1_nome" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Nome do Participante <span class="text-red-500">*</span></label>
+              <input type="text" id="b1_nome" name="b1_nome" required placeholder="Nome do entrevistado" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800">
+            </div>
+            <div>
+              <label for="b1_cargo" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Cargo / Função <span class="text-red-500">*</span></label>
+              <input type="text" id="b1_cargo" name="b1_cargo" required placeholder="Ex: Secretário, Diretor, Engenheiro" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800">
+            </div>
+            <div>
+              <label for="b1_orgao" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Órgão / Secretaria <span class="text-red-500">*</span></label>
+              <input type="text" id="b1_orgao" name="b1_orgao" required placeholder="Ex: Sec. de Obras / SAAE" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800">
+            </div>
+
+            <div class="sm:col-span-3">
+              <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Perfil Institucional de Participação <span class="text-red-500">*</span></label>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 text-xs">
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="radio" name="b1_participacao" value="Prefeito(a)/Vice" class="custom-checkbox">
+                  <span>Prefeito(a) / Vice</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="radio" name="b1_participacao" value="Secretario(a)" class="custom-checkbox">
+                  <span>Secretário(a)</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="radio" name="b1_participacao" value="Tecnico/Engenheiro" class="custom-checkbox">
+                  <span>Técnico / Engenheiro</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="radio" name="b1_participacao" value="Prestador" class="custom-checkbox">
+                  <span>Prestador</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="radio" name="b1_participacao" value="Consorcio" class="custom-checkbox">
+                  <span>Consórcio</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="radio" name="b1_participacao" value="Outro" class="custom-checkbox">
+                  <span>Outro</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label for="b1_whatsapp" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">WhatsApp com DDD <span class="text-red-500">*</span></label>
+              <input type="tel" id="b1_whatsapp" name="b1_whatsapp" required placeholder="(00) 00000-0000" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800">
+            </div>
+            <div>
+              <label for="b1_email" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">E-mail <span class="text-red-500">*</span></label>
+              <input type="email" id="b1_email" name="b1_email" required placeholder="gestor@municipio.gov.br" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800">
+            </div>
+            <div>
+              <label for="b1_data" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Data da Escuta</label>
+              <input type="date" id="b1_data" name="b1_data" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800">
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- TÓPICO 2: RETRATO INSTITUCIONAL & TRIAGEM -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <section id="bloco2_institucional" class="secao-formulario lg:col-span-12 bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-slate-200" data-base-title="Retrato Institucional — Quem Faz o Quê?">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+            <div class="flex items-center gap-3">
+              <span class="secao-badge w-8 h-8 rounded-xl bg-blue-100 text-blue-800 font-black text-sm flex items-center justify-center border border-blue-200 shadow-sm">2</span>
+              <div>
+                <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">Retrato Institucional — Quem Faz o Quê?</h3>
+                <p class="text-xs text-slate-500">Mapeamento direto dos responsáveis por titularidade, prestação e regulação</p>
+              </div>
+            </div>
+            <span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Obrigatório</span>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-200 mb-5">
+            <table class="min-w-full divide-y divide-slate-200 text-xs">
+              <thead class="bg-slate-100 text-slate-700 font-bold uppercase tracking-wider">
+                <tr>
+                  <th scope="col" class="py-2.5 px-3 text-left w-1/4">Eixo</th>
+                  <th scope="col" class="py-2.5 px-3 text-left w-1/4">Titular</th>
+                  <th scope="col" class="py-2.5 px-3 text-left w-1/4">Prestador / Operação</th>
+                  <th scope="col" class="py-2.5 px-3 text-left w-1/4">Regulação / Fiscalização</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-slate-100">
+                <tr>
+                  <td class="py-2.5 px-3 font-semibold text-slate-800">Abastecimento de Água</td>
+                  <td class="py-2 px-3"><input type="text" name="b2_inst_agua_titular" placeholder="Ex: Município" value="Município" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+                  <td class="py-2 px-3">
+                    <select name="b2_inst_agua_prestador" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs">
+                      <option value="">Selecione...</option>
+                      <option value="Companhia Estadual">Companhia Estadual</option>
+                      <option value="Autarquia Municipal (SAAE)">Autarquia Municipal (SAAE)</option>
+                      <option value="Concessao Privada">Concessão Privada</option>
+                      <option value="Administracao Direta">Administração Direta</option>
+                      <option value="Associacao Comunitaria">Associação Comunitária</option>
+                      <option value="Nao sabe informar">Não sabe informar</option>
+                      <option value="Outro">Outro</option>
+                    </select>
+                  </td>
+                  <td class="py-2 px-3"><input type="text" name="b2_inst_agua_regulacao" placeholder="Ex: Agência Reguladora / Não tem" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-3 font-semibold text-slate-800">Esgotamento Sanitário</td>
+                  <td class="py-2 px-3"><input type="text" name="b2_inst_esgoto_titular" placeholder="Ex: Município" value="Município" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+                  <td class="py-2 px-3">
+                    <select name="b2_inst_esgoto_prestador" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs">
+                      <option value="">Selecione...</option>
+                      <option value="Companhia Estadual">Companhia Estadual</option>
+                      <option value="Autarquia Municipal (SAAE)">Autarquia Municipal (SAAE)</option>
+                      <option value="Concessao Privada">Concessão Privada</option>
+                      <option value="Administracao Direta">Administração Direta</option>
+                      <option value="Sem atendimento formal">Sem atendimento formal</option>
+                      <option value="Nao sabe informar">Não sabe informar</option>
+                      <option value="Outro">Outro</option>
+                    </select>
+                  </td>
+                  <td class="py-2 px-3"><input type="text" name="b2_inst_esgoto_regulacao" placeholder="Ex: Agência Reguladora / Não tem" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-3 font-semibold text-slate-800">Resíduos Sólidos</td>
+                  <td class="py-2 px-3"><input type="text" name="b2_inst_residuos_titular" placeholder="Ex: Município / Consórcio" value="Município" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+                  <td class="py-2 px-3">
+                    <select name="b2_inst_residuos_prestador" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs">
+                      <option value="">Selecione...</option>
+                      <option value="Administracao Direta (Prefeitura)">Administração Direta (Prefeitura)</option>
+                      <option value="Empresa Terceirizada Contratada">Empresa Contratada</option>
+                      <option value="Consorcio Publico">Consórcio Público</option>
+                      <option value="Concessao / PPP">Concessão / PPP</option>
+                      <option value="Nao sabe informar">Não sabe informar</option>
+                    </select>
+                  </td>
+                  <td class="py-2 px-3"><input type="text" name="b2_inst_residuos_regulacao" placeholder="Ex: Inexistente / Regional" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-3 font-semibold text-slate-800">Drenagem Pluvial</td>
+                  <td class="py-2 px-3"><input type="text" name="b2_inst_drenagem_titular" placeholder="Ex: Município" value="Município" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+                  <td class="py-2 px-3">
+                    <select name="b2_inst_drenagem_prestador" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs">
+                      <option value="">Selecione...</option>
+                      <option value="Sec. Obras / Infraestrutura">Sec. Obras / Infraestrutura</option>
+                      <option value="Empresa Terceirizada">Empresa Terceirizada</option>
+                      <option value="Autarquia Municipal">Autarquia Municipal</option>
+                      <option value="Sem estrutura definida">Sem estrutura definida</option>
+                      <option value="Nao sabe informar">Não sabe informar</option>
+                    </select>
+                  </td>
+                  <td class="py-2 px-3"><input type="text" name="b2_inst_drenagem_regulacao" placeholder="Ex: Sem regulação formal" value="Sem regulação formal" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- GATILHO DE TRIAGEM COM OS 4 FILTROS MARCADOS POR PADRÃO -->
+          <div class="p-4 sm:p-5 bg-gradient-to-r from-sky-50 via-blue-50 to-indigo-50 rounded-xl border-2 border-sky-300">
+            <div class="flex items-start gap-3">
+              <div class="p-2 bg-brand-600 text-white rounded-lg shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+              </div>
+              <div class="flex-1">
+                <h4 class="text-sm font-bold text-slate-900">
+                  Pergunta de Triagem: Quais eixos apresentam problemas/gargalos operacionais críticos para detalhamento nesta escuta?
+                </h4>
+                <p class="text-xs text-slate-600 mt-1 mb-3">
+                  Todos os eixos estão marcados para visualização completa. Desmarque apenas caso o município não tenha nenhuma dor no eixo correspondente.
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                  <label class="flex items-center gap-2.5 p-2.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-blue-500 hover:bg-blue-50/40">
+                    <input type="checkbox" id="triage_agua" name="triage_eixos" value="Agua" checked onchange="handleTriageChange()" class="custom-checkbox">
+                    <span class="text-xs font-semibold text-slate-800">Abastecimento de Água</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 p-2.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/40">
+                    <input type="checkbox" id="triage_esgoto" name="triage_eixos" value="Esgoto" checked onchange="handleTriageChange()" class="custom-checkbox">
+                    <span class="text-xs font-semibold text-slate-800">Esgotamento Sanitário</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 p-2.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-amber-500 hover:bg-amber-50/40">
+                    <input type="checkbox" id="triage_residuos" name="triage_eixos" value="Residuos" checked onchange="handleTriageChange()" class="custom-checkbox">
+                    <span class="text-xs font-semibold text-slate-800">Resíduos Sólidos</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 p-2.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-sky-500 hover:bg-sky-50/40">
+                    <input type="checkbox" id="triage_drenagem" name="triage_eixos" value="Drenagem" checked onchange="handleTriageChange()" class="custom-checkbox">
+                    <span class="text-xs font-semibold text-slate-800">Drenagem Pluvial</span>
+                  </label>
+                  <label class="sm:col-span-2 flex items-center gap-2.5 p-2.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-slate-400">
+                    <input type="checkbox" id="triage_nenhum" name="triage_eixos" value="Nenhum" onchange="handleTriageNoneChange()" class="custom-checkbox">
+                    <span class="text-xs font-semibold text-slate-700">Sem gargalos nesses eixos (Saltar direto para Planejamento/PMSB)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- TÓPICO CONDICIONAL: ÁGUA -->
+      <div id="row_agua" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <section id="bloco3_agua" class="secao-formulario lg:col-span-8 bg-white rounded-2xl p-5 sm:p-7 shadow-sm border-2 border-blue-200" data-base-title="Ficha de Escuta: Abastecimento de Água">
+          <div class="flex items-center justify-between border-b border-blue-100 pb-3 mb-4">
+            <div class="flex items-center gap-3">
+              <span class="secao-badge w-8 h-8 rounded-xl bg-blue-600 text-white font-black text-sm flex items-center justify-center shadow">3</span>
+              <div>
+                <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">Ficha de Escuta: Abastecimento de Água</h3>
+                <p class="text-xs text-slate-500">Mapeamento da cadeia, produção e gargalos operacionais</p>
+              </div>
+            </div>
+            <button type="button" onclick="closeConditionalBlock('Agua')" class="text-xs text-slate-400 hover:text-red-600 font-medium">✕ Ocultar</button>
+          </div>
+
+          <div class="space-y-4 text-xs">
+            <div>
+              <label class="block font-bold text-slate-700 uppercase tracking-wider mb-2">Etapas da cadeia onde os problemas se concentram:</label>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-blue-50 cursor-pointer">
+                  <input type="checkbox" name="b3_agua_cadeia" value="Captacao" class="custom-checkbox"> <span>Captação / Manancial</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-blue-50 cursor-pointer">
+                  <input type="checkbox" name="b3_agua_cadeia" value="Aducao_Bruta" class="custom-checkbox"> <span>Adução de Água Bruta</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-blue-50 cursor-pointer">
+                  <input type="checkbox" name="b3_agua_cadeia" value="Tratamento_ETA" class="custom-checkbox"> <span>Tratamento (ETA)</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-blue-50 cursor-pointer">
+                  <input type="checkbox" name="b3_agua_cadeia" value="Reservacao" class="custom-checkbox"> <span>Reservação</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-blue-50 cursor-pointer">
+                  <input type="checkbox" name="b3_agua_cadeia" value="Rede_Distribuicao" class="custom-checkbox"> <span>Rede de Distribuição</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-blue-50 cursor-pointer">
+                  <input type="checkbox" name="b3_agua_cadeia" value="Medicao_Cobranca" class="custom-checkbox"> <span>Medição / Hidrometria</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Mesma instituição produz e distribui?</label>
+                <select name="b3_agua_mesma_inst" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+                  <option value="">Selecione...</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Nao">Não</option>
+                  <option value="Parcialmente">Parcialmente</option>
+                  <option value="Nao sabe informar">Não sabe informar</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Principal fonte de captação:</label>
+                <select name="b3_agua_fonte" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+                  <option value="">Selecione...</option>
+                  <option value="Superficial (Rio/Acude)">Superficial (Rio / Açude)</option>
+                  <option value="Subterranea (Pocos)">Subterrânea (Poços tubulares)</option>
+                  <option value="Sistema Integrado Regional">Sistema Integrado Regional</option>
+                  <option value="Carro-Pipa / Emergencial">Carro-Pipa / Emergencial</option>
+                  <option value="Nao sabe informar">Não sabe informar</option>
+                </select>
+              </div>
+              <div>
+                <label for="b3_agua_divisao_obs" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Obs. da Divisão (se houver):</label>
+                <input type="text" id="b3_agua_divisao_obs" name="b3_agua_divisao_obs" placeholder="Ex: Estado capta, município distribui" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1.5">Checklist de Gargalos Críticos:</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b3_agua_gargalos" value="Perdas elevadas" class="custom-checkbox"> <span>Perdas elevadas</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b3_agua_gargalos" value="Pressao / intermitencia" class="custom-checkbox"> <span>Pressão / Intermitência</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b3_agua_gargalos" value="Qualidade da agua" class="custom-checkbox"> <span>Qualidade da água</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b3_agua_gargalos" value="Falta de energia / oscilacao" class="custom-checkbox"> <span class="font-semibold text-rose-700">Falta/queda de energia</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b3_agua_gargalos" value="Manutencao eletromecanica" class="custom-checkbox"> <span>Queima frequente de bombas</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b3_agua_gargalos" value="Falta de hidrometros" class="custom-checkbox"> <span>Falta de hidrômetros</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b3_agua_gargalos" value="Custo de energia" class="custom-checkbox"> <span>Custo alto de energia</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b3_agua_gargalos" value="Expansao rural travada" class="custom-checkbox"> <span>Expansão rural travada</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label for="b3_agua_dor" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Descrição da Dor e Realidade Operacional:</label>
+              <textarea id="b3_agua_dor" name="b3_agua_dor" rows="2" placeholder="Descreva localidades sem água regular, conflito com concessionária, queima de equipamentos..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- BLOCO LATERAL DE FORA -->
+        <aside class="lg:col-span-4 bg-white p-4 rounded-2xl border border-sky-200 shadow-sm text-xs space-y-3">
+          <div class="flex items-center gap-2 pb-2 border-b border-sky-100">
+            <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+            <h4 class="font-bold text-sky-950 uppercase tracking-wider text-[11px]">Termos — Água</h4>
+          </div>
+          <div class="space-y-2.5 text-[11px] text-slate-600 leading-relaxed">
+            <div>
+              <strong class="text-sky-900 block">Adução de Água Bruta vs. Tratada:</strong>
+              Tubulações troncais (adutoras) que transportam água do manancial até a ETA (bruta) ou da ETA aos reservatórios principais (tratada), sem ligações domiciliares diretas.
+            </div>
+            <div>
+              <strong class="text-sky-900 block">ETA (Estação de Tratamento de Água):</strong>
+              Conjunto de tanques e filtros que realizam coagulação, floculação, decantação, filtração e desinfecção para tornar a água própria para consumo.
+            </div>
+            <div>
+              <strong class="text-sky-900 block">Intermitência vs. Perdas:</strong>
+              Intermitência é o fornecimento descontínuo ("água dia sim, dia não"). Perdas físicas são vazamentos em rede que não chegam a ser faturados nem consumidos.
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- TÓPICO CONDICIONAL: ESGOTO -->
+      <div id="row_esgoto" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <section id="bloco4_esgoto" class="secao-formulario lg:col-span-8 bg-white rounded-2xl p-5 sm:p-7 shadow-sm border-2 border-emerald-200" data-base-title="Ficha de Escuta: Esgotamento Sanitário">
+          <div class="flex items-center justify-between border-b border-emerald-100 pb-3 mb-4">
+            <div class="flex items-center gap-3">
+              <span class="secao-badge w-8 h-8 rounded-xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center shadow">4</span>
+              <div>
+                <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">Ficha de Escuta: Esgotamento Sanitário</h3>
+                <p class="text-xs text-slate-500">Diagnóstico da rede, elevatórias, estações e soluções individuais</p>
+              </div>
+            </div>
+            <button type="button" onclick="closeConditionalBlock('Esgoto')" class="text-xs text-slate-400 hover:text-red-600 font-medium">✕ Ocultar</button>
+          </div>
+
+          <div class="space-y-4 text-xs">
+            <div>
+              <label class="block font-bold text-slate-700 uppercase tracking-wider mb-2">Etapas críticas onde se concentram os problemas:</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-emerald-50 cursor-pointer">
+                  <input type="checkbox" name="b4_esgoto_cadeia" value="Rede_Coleta" class="custom-checkbox"> <span>Coleta / Rede</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-emerald-50 cursor-pointer">
+                  <input type="checkbox" name="b4_esgoto_cadeia" value="Elevatorias_EEE" class="custom-checkbox"> <span>Elevatórias (EEE)</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-emerald-50 cursor-pointer">
+                  <input type="checkbox" name="b4_esgoto_cadeia" value="Tratamento_ETE" class="custom-checkbox"> <span>Tratamento (ETE)</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-emerald-50 cursor-pointer">
+                  <input type="checkbox" name="b4_esgoto_cadeia" value="Disposicao_Final" class="custom-checkbox"> <span>Disposição / Emissário</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Situação do atendimento:</label>
+                <select name="b4_esgoto_situacao" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+                  <option value="">Selecione a cobertura...</option>
+                  <option value="Amplo_Maior80">Amplo (acima de 80% atendido)</option>
+                  <option value="Parcial_30a80">Parcial (entre 30% e 80%)</option>
+                  <option value="Muito_limitado">Muito limitado (abaixo de 30%)</option>
+                  <option value="Inexistente_Fossas">Inexistente / Apenas fossas rudimentares</option>
+                  <option value="Nao sabe informar">Não sabe informar</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Existem soluções individuais / fossas relevantes?</label>
+                <div class="flex items-center gap-3 pt-2">
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="b4_esgoto_descentralizado" value="Sim" class="custom-checkbox"> <span>Sim</span></label>
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="b4_esgoto_descentralizado" value="Nao" class="custom-checkbox"> <span>Não</span></label>
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="b4_esgoto_descentralizado" value="Nao sabe informar" class="custom-checkbox"> <span>Não sabe</span></label>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1.5">Checklist de Gargalos Críticos:</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b4_esgoto_gargalos" value="Ausencia de rede" class="custom-checkbox"> <span>Ausência de rede</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b4_esgoto_gargalos" value="Esgoto a ceu aberto" class="custom-checkbox"> <span>Esgoto a céu aberto</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b4_esgoto_gargalos" value="Falta de energia na ETE/EEE" class="custom-checkbox"> <span class="font-semibold text-rose-700">Falta de energia / EEE parada</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b4_esgoto_gargalos" value="ETE inoperante/abandonada" class="custom-checkbox"> <span>ETE inoperante ou danificada</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b4_esgoto_gargalos" value="Falta de projetos executivos" class="custom-checkbox"> <span>Falta de projeto executivo</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b4_esgoto_gargalos" value="Licenciamento travado" class="custom-checkbox"> <span>Licença ambiental travada</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b4_esgoto_gargalos" value="Extravasamento/refluxo" class="custom-checkbox"> <span>Extravasamentos frequentes</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b4_esgoto_gargalos" value="Outro" class="custom-checkbox"> <span>Outro</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label for="b4_esgoto_dor" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Descrição da Dor e Gargalo Operacional:</label>
+              <textarea id="b4_esgoto_dor" name="b4_esgoto_dor" rows="2" placeholder="Ex: ETE construída que nunca funcionou por falta de rede elétrica trifásica ou licença ambiental..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- BLOCO LATERAL DE FORA -->
+        <aside class="lg:col-span-4 bg-white p-4 rounded-2xl border border-emerald-200 shadow-sm text-xs space-y-3">
+          <div class="flex items-center gap-2 pb-2 border-b border-emerald-100">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <h4 class="font-bold text-emerald-950 uppercase tracking-wider text-[11px]">Termos — Esgotamento</h4>
+          </div>
+          <div class="space-y-2.5 text-[11px] text-slate-600 leading-relaxed">
+            <div>
+              <strong class="text-emerald-900 block">Coleta / Rede Coletora:</strong>
+              Conjunto de tubulações que recebe os efluentes sanitários dos imóveis e os transporta por gravidade até os coletores e elevatórias.
+            </div>
+            <div>
+              <strong class="text-emerald-900 block">EEE (Estação Elevatória de Esgoto):</strong>
+              Instalação com bombas que eleva o esgoto de pontos baixos para pontos mais altos quando o terreno não tem caimento natural.
+            </div>
+            <div>
+              <strong class="text-emerald-900 block">ETE (Estação de Tratamento de Esgoto):</strong>
+              Unidade com processos físicos e biológicos para despoluir a água antes de devolvê-la aos rios ou mananciais.
+            </div>
+            <div>
+              <strong class="text-emerald-900 block">Disposição Final / Emissário:</strong>
+              Canalização que transporta o efluente tratado até o ponto de descarte seguro e licenciado no corpo hídrico.
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- TÓPICO CONDICIONAL: RESÍDUOS SÓLIDOS -->
+      <div id="row_residuos" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <section id="bloco5_residuos" class="secao-formulario lg:col-span-8 bg-white rounded-2xl p-5 sm:p-7 shadow-sm border-2 border-amber-200" data-base-title="Ficha de Escuta: Resíduos Sólidos e Limpeza">
+          <div class="flex items-center justify-between border-b border-amber-100 pb-3 mb-4">
+            <div class="flex items-center gap-3">
+              <span class="secao-badge w-8 h-8 rounded-xl bg-amber-600 text-white font-black text-sm flex items-center justify-center shadow">5</span>
+              <div>
+                <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">Ficha de Escuta: Resíduos Sólidos e Limpeza</h3>
+                <p class="text-xs text-slate-500">Destinação final, cobrança, frota e cooperativas</p>
+              </div>
+            </div>
+            <button type="button" onclick="closeConditionalBlock('Residuos')" class="text-xs text-slate-400 hover:text-red-600 font-medium">✕ Ocultar</button>
+          </div>
+
+          <div class="space-y-4 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Cobrança / Taxa de Lixo:</label>
+                <select name="b5_res_cobranca_status" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+                  <option value="">Selecione...</option>
+                  <option value="Instituida_Cobrada">Instituída e cobrada</option>
+                  <option value="Aprovada_NaoCobrada">Aprovada em lei, mas não cobrada</option>
+                  <option value="Em_Tramitacao">Em elaboração / tramitação</option>
+                  <option value="Nao_Instituida">Não instituída / Resistência política</option>
+                  <option value="Nao sabe informar">Não sabe informar</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Destinação Final:</label>
+                <select name="b5_res_destinacao_status" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+                  <option value="">Selecione...</option>
+                  <option value="Lixao_ceu_aberto">Lixão a céu aberto ativo</option>
+                  <option value="Aterro_controlado">Aterro controlado</option>
+                  <option value="Transbordo_Aterro_Sanitario">Transbordo para aterro sanitário</option>
+                  <option value="Aterro_Sanitario_Proprio">Aterro sanitário próprio regular</option>
+                  <option value="Nao sabe informar">Não sabe informar</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Frota de Veículos:</label>
+                <select name="b5_res_frota_status" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+                  <option value="">Selecione...</option>
+                  <option value="Suficiente_Propria">Suficiente (frota própria adequada)</option>
+                  <option value="Suficiente_Terc">Suficiente (locada / terceirizada)</option>
+                  <option value="Insuficiente_Sucateada">Insuficiente ou sucateada</option>
+                  <option value="Inexistente_Cacambas">Inexistente (veículos improvisados/caçambas)</option>
+                  <option value="Nao sabe informar">Não sabe informar</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Coleta Seletiva / Catadores:</label>
+                <select name="b5_res_catadores_status" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+                  <option value="">Selecione...</option>
+                  <option value="Com_Cooperativa_Remunerada">Cooperativa formalizada e apoiada</option>
+                  <option value="Catadores_Informais">Apenas catadores informais</option>
+                  <option value="Inexistente">Inexistente no município</option>
+                  <option value="Nao sabe informar">Não sabe informar</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1.5">Checklist de Gargalos Críticos:</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b5_res_gargalos" value="Lixao ativo" class="custom-checkbox"> <span>Lixão a céu aberto ativo</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b5_res_gargalos" value="Frete / distancia aterro" class="custom-checkbox"> <span>Distância e frete inviável</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b5_res_gargalos" value="Frota insuficiente" class="custom-checkbox"> <span class="font-semibold text-rose-700">Frota insuficiente/quebras</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b5_res_gargalos" value="Custo consome orcamento" class="custom-checkbox"> <span>Custo asfixia o orçamento</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b5_res_gargalos" value="Resistencia taxa lixo" class="custom-checkbox"> <span>Resistência política à cobrança</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b5_res_gargalos" value="Licenciamento transbordo" class="custom-checkbox"> <span>Licença de transbordo travada</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b5_res_gargalos" value="Consorcio com impasse" class="custom-checkbox"> <span>Impasse no consórcio regional</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b5_res_gargalos" value="Outro" class="custom-checkbox"> <span>Outro</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label for="b5_res_dor" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Descrição da Dor e Gargalo Operacional:</label>
+              <textarea id="b5_res_dor" name="b5_res_dor" rows="2" placeholder="Ex: Pressão do MP para encerrar o lixão, porém o transbordo e frete custariam R$ 200 mil por mês..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- BLOCO LATERAL DE FORA -->
+        <aside class="lg:col-span-4 bg-white p-4 rounded-2xl border border-amber-200 shadow-sm text-xs space-y-3">
+          <div class="flex items-center gap-2 pb-2 border-b border-amber-100">
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+            <h4 class="font-bold text-amber-950 uppercase tracking-wider text-[11px]">Termos — Resíduos Sólidos</h4>
+          </div>
+          <div class="space-y-2.5 text-[11px] text-slate-600 leading-relaxed">
+            <div>
+              <strong class="text-amber-900 block">Estação de Transbordo:</strong>
+              Pátio intermediário onde caminhões de coleta urbana descarregam o lixo para carretas maiores, barateando o transporte até aterros sanitários distantes.
+            </div>
+            <div>
+              <strong class="text-amber-900 block">Lixão vs. Aterro Sanitário:</strong>
+              Lixão é descarte no solo a céu aberto. Aterro sanitário é obra com mantas impermeabilizantes, drenagem de chorume e tratamento do biogás.
+            </div>
+            <div>
+              <strong class="text-amber-900 block">Taxa/Tarifa de Manejo de Resíduos:</strong>
+              Cobrança instituída para custear coleta e destinação final (sua ausência gera renúncia fiscal segundo o Art. 35 do Marco Legal).
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- TÓPICO CONDICIONAL: DRENAGEM PLUVIAL -->
+      <div id="row_drenagem" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <section id="bloco6_drenagem" class="secao-formulario lg:col-span-8 bg-white rounded-2xl p-5 sm:p-7 shadow-sm border-2 border-sky-200" data-base-title="Ficha de Escuta: Drenagem e Águas Pluviais">
+          <div class="flex items-center justify-between border-b border-sky-100 pb-3 mb-4">
+            <div class="flex items-center gap-3">
+              <span class="secao-badge w-8 h-8 rounded-xl bg-sky-600 text-white font-black text-sm flex items-center justify-center shadow">6</span>
+              <div>
+                <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">Ficha de Escuta: Drenagem e Águas Pluviais</h3>
+                <p class="text-xs text-slate-500">Manejo pluvial, pontos de alagamento, cadastro e Defesa Civil</p>
+              </div>
+            </div>
+            <button type="button" onclick="closeConditionalBlock('Drenagem')" class="text-xs text-slate-400 hover:text-red-600 font-medium">✕ Ocultar</button>
+          </div>
+
+          <div class="space-y-4 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Equipe técnica dedicada?</label>
+                <select name="b6_dren_equipe" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+                  <option value="">Selecione...</option>
+                  <option value="Sim_EquipeDedicada">Sim, equipe/setor exclusivo</option>
+                  <option value="Parcial_DivisaoObras">Não, atua dividida com Obras Gerais</option>
+                  <option value="Inexistente">Inexistente / Sem engenheiro</option>
+                  <option value="Nao sabe informar">Não sabe informar</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Existe cadastro da rede?</label>
+                <select name="b6_dren_cadastro" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+                  <option value="">Selecione...</option>
+                  <option value="Sim_Digital_SIG">Sim, digital georreferenciado (SIG)</option>
+                  <option value="Sim_Plantas_Papel">Sim, em plantas físicas / papel</option>
+                  <option value="Nao_Existe">Não existe (rede desconhecida)</option>
+                  <option value="Nao sabe informar">Não sabe informar</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Gravidade dos Alagamentos:</label>
+                <select name="b6_dren_alagamentos" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+                  <option value="">Selecione...</option>
+                  <option value="Severos_Recorrentes">Severos e recorrentes</option>
+                  <option value="Moderados_Pontuais">Moderados durante chuvas fortes</option>
+                  <option value="Raros_Inexistentes">Raros ou sem histórico expressivo</option>
+                  <option value="Nao sabe informar">Não sabe informar</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label for="b6_dren_localidades" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Pontos Críticos / Bairros Mais Afetados:</label>
+              <input type="text" id="b6_dren_localidades" name="b6_dren_localidades" placeholder="Ex: Bairro Centro (Canal Principal), Feira Livre..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800">
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1.5">Checklist de Gargalos Críticos:</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b6_dren_gargalos" value="Falta dados topograficos" class="custom-checkbox"> <span>Sem dados hidrológicos/topografia</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b6_dren_gargalos" value="Canais assoreados" class="custom-checkbox"> <span>Canais assoreados / estrangulados</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b6_dren_gargalos" value="Microdrenagem insuficiente" class="custom-checkbox"> <span>Bueiros e bocas de lobo insuficientes</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b6_dren_gargalos" value="Maquinario limpeza caro" class="custom-checkbox"> <span>Custo alto para desassorear</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b6_dren_gargalos" value="Ocupacao de APP" class="custom-checkbox"> <span>Ocupação desordenada de margens</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b6_dren_gargalos" value="Erosao e encostas" class="custom-checkbox"> <span>Erosão severa / Voçorocas</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b6_dren_gargalos" value="Sem plano de contingencia" class="custom-checkbox"> <span>Defesa Civil sem plano/alerta</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b6_dren_gargalos" value="Outro" class="custom-checkbox"> <span>Outro</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label for="b6_dren_dor" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Descrição da Dor e Gargalo Operacional:</label>
+              <textarea id="b6_dren_dor" name="b6_dren_dor" rows="2" placeholder="Ex: Chuvas de 20 minutos inundam a área central por estrangulamento das manilhas antigas..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- BLOCO LATERAL DE FORA -->
+        <aside class="lg:col-span-4 bg-white p-4 rounded-2xl border border-sky-200 shadow-sm text-xs space-y-3">
+          <div class="flex items-center gap-2 pb-2 border-b border-sky-100">
+            <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+            <h4 class="font-bold text-sky-950 uppercase tracking-wider text-[11px]">Termos — Drenagem Pluvial</h4>
+          </div>
+          <div class="space-y-2.5 text-[11px] text-slate-600 leading-relaxed">
+            <div>
+              <strong class="text-sky-900 block">Micro vs. Macrodrenagem:</strong>
+              Microdrenagem são os bueiros, sarjetas e bocas de lobo. Macrodrenagem engloba canais principais, rios urbanos e bacias de amortecimento (piscinões).
+            </div>
+            <div>
+              <strong class="text-sky-900 block">Cadastro de Rede Pluvial:</strong>
+              Mapeamento técnico e georreferenciado da localização, cotas e diâmetros das galerias sob as ruas.
+            </div>
+            <div>
+              <strong class="text-sky-900 block">Plano de Contingência:</strong>
+              Protocolo de resposta e alertas da Defesa Civil para proteção de moradores em pontos críticos de inundação.
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- TÓPICO: PMSB E CAPACIDADE MUNICIPAL -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <section id="bloco7_pmsb" class="secao-formulario lg:col-span-8 bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-slate-200" data-base-title="PMSB, Planejamento e Capacidade Municipal">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+            <div class="flex items-center gap-3">
+              <span class="secao-badge w-8 h-8 rounded-xl bg-purple-100 text-purple-800 font-black text-sm flex items-center justify-center border border-purple-200 shadow-sm">7</span>
+              <div>
+                <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">PMSB, Planejamento e Capacidade Municipal</h3>
+                <p class="text-xs text-slate-500">Maturidade do plano municipal e governança local</p>
+              </div>
+            </div>
+            <span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Obrigatório</span>
+          </div>
+
+          <div class="space-y-4 text-xs">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="b7_pmsb_status" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Situação do PMSB: <span class="text-red-500">*</span>
+                </label>
+                <select id="b7_pmsb_status" name="b7_pmsb_status" required class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
+                  <option value="">Selecione...</option>
+                  <option value="Inexistente">Inexistente / Nunca elaborado</option>
+                  <option value="Desatualizado_Mais10anos">Desatualizado (elaborado há mais de 10 anos)</option>
+                  <option value="Elaborado_Mas_Inoperante">Elaborado/Aprovado, porém inoperante na prática</option>
+                  <option value="Vigente_Em_Execucao">Vigente, atualizado e orientando as obras</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  O PMSB orienta os investimentos reais e o PPA?
+                </label>
+                <div class="flex items-center gap-3 pt-2">
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="b7_pmsb_orienta" value="Sim" class="custom-checkbox"> <span>Sim</span></label>
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="b7_pmsb_orienta" value="Parcialmente" class="custom-checkbox"> <span>Parcialmente</span></label>
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="b7_pmsb_orienta" value="Nao" class="custom-checkbox"> <span>Não</span></label>
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="b7_pmsb_orienta" value="Nao sabe informar" class="custom-checkbox"> <span>Não sabe</span></label>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1.5">Principais entraves para tirar o PMSB do papel:</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b7_pmsb_obstaculos" value="Falta equipe tecnica" class="custom-checkbox"> <span>Falta de equipe técnica</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b7_pmsb_obstaculos" value="Falta recursos proprios" class="custom-checkbox"> <span>Falta de recursos próprios</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b7_pmsb_obstaculos" value="Falta projetos de engenharia" class="custom-checkbox"> <span>Falta de projetos executivos</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b7_pmsb_obstaculos" value="Descontinuidade politica" class="custom-checkbox"> <span>Troca de mandatos / descontinuidade</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b7_pmsb_obstaculos" value="Descompasso orcamentario" class="custom-checkbox"> <span>Descompasso orçamentário</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b7_pmsb_obstaculos" value="Travas ambientais" class="custom-checkbox"> <span>Pendências ambientais</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b7_pmsb_obstaculos" value="Travas fundiarias" class="custom-checkbox"> <span>Insegurança fundiária</span>
+                </label>
+                <label class="flex items-center gap-1.5 p-1.5 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b7_pmsb_obstaculos" value="Outro" class="custom-checkbox"> <span>Outro</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- BLOCO LATERAL DE FORA -->
+        <aside class="lg:col-span-4 bg-white p-4 rounded-2xl border border-purple-200 shadow-sm text-xs space-y-3">
+          <div class="flex items-center gap-2 pb-2 border-b border-purple-100">
+            <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+            <h4 class="font-bold text-purple-950 uppercase tracking-wider text-[11px]">Termos — Planejamento</h4>
+          </div>
+          <div class="space-y-2.5 text-[11px] text-slate-600 leading-relaxed">
+            <div>
+              <strong class="text-purple-900 block">PMSB (Plano Municipal de Saneamento):</strong>
+              Instrumento legal obrigatório de planejamento para os 4 eixos (água, esgoto, resíduos, drenagem) com horizonte de 20 anos e metas de universalização.
+            </div>
+            <div>
+              <strong class="text-purple-800 block">Compatibilização PPA / LOA:</strong>
+              Exigência de que os projetos do PMSB constem no orçamento anual da prefeitura para terem dotação orçamentária e poderem ser contratados.
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- TÓPICO: INVESTIMENTOS E NOVO PAC -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <section id="bloco8_investimentos" class="secao-formulario lg:col-span-8 bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-slate-200" data-base-title="Investimentos e Novo PAC">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+            <div class="flex items-center gap-3">
+              <span class="secao-badge w-8 h-8 rounded-xl bg-purple-100 text-purple-800 font-black text-sm flex items-center justify-center border border-purple-200 shadow-sm">8</span>
+              <div>
+                <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">Investimentos e Novo PAC</h3>
+                <p class="text-xs text-slate-500">Acesso a recursos federais e carteira de projetos pretendidos ou contratados</p>
+              </div>
+            </div>
+            <span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Obrigatório</span>
+          </div>
+
+          <div class="space-y-5 text-xs">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <label class="block font-bold text-slate-700 uppercase tracking-wider">
+                  Carteira de Projetos / Obras Pretendidas ou Aprovadas:
+                </label>
+                <button type="button" onclick="addProjectRow()" class="px-2.5 py-1 bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold rounded-lg text-xs flex items-center gap-1 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                  Adicionar Novo Projeto
+                </button>
+              </div>
+
+              <div class="overflow-x-auto rounded-xl border border-slate-200">
+                <table class="min-w-full divide-y divide-slate-200 text-xs" id="projectsTable">
+                  <thead class="bg-slate-100 text-slate-700 font-bold uppercase tracking-wider">
+                    <tr>
+                      <th scope="col" class="py-2 px-2.5 text-left w-1/4">Objeto da Obra / Eixo</th>
+                      <th scope="col" class="py-2 px-2.5 text-left w-1/4">Estágio / Situação</th>
+                      <th scope="col" class="py-2 px-2.5 text-left w-1/4">Fonte Pretendida / Valor</th>
+                      <th scope="col" class="py-2 px-2.5 text-left w-1/4">Principal Impedimento</th>
+                      <th scope="col" class="py-2 px-1 text-center w-8">Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-slate-100" id="projectsTableBody">
+                    <tr class="project-row">
+                      <td class="py-1.5 px-2"><input type="text" name="proj_objeto[]" placeholder="Ex: Ampliação da ETA Sede" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+                      <td class="py-1.5 px-2"><input type="text" name="proj_situacao[]" placeholder="Ex: Projeto básico aprovado" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+                      <td class="py-1.5 px-2"><input type="text" name="proj_valor[]" placeholder="Ex: R$ 4,5M - Novo PAC" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+                      <td class="py-1.5 px-2"><input type="text" name="proj_impedimento[]" placeholder="Ex: Licença ambiental prévia" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+                      <td class="py-1.5 px-1 text-center">
+                        <button type="button" onclick="removeProjectRow(this)" title="Remover projeto" class="text-slate-400 hover:text-red-600 p-1">✕</button>
+                      </td>
+                    </tr>
+                    <tr class="project-row">
+                      <td class="py-1.5 px-2"><input type="text" name="proj_objeto[]" placeholder="Ex: Esgoto Bairro Novo" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+                      <td class="py-1.5 px-2"><input type="text" name="proj_situacao[]" placeholder="Ex: Cadastrado Transferegov" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+                      <td class="py-1.5 px-2"><input type="text" name="proj_valor[]" placeholder="Ex: R$ 6M - MCID / OGU" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+                      <td class="py-1.5 px-2"><input type="text" name="proj_impedimento[]" placeholder="Ex: Falta projeto executivo" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+                      <td class="py-1.5 px-1 text-center">
+                        <button type="button" onclick="removeProjectRow(this)" title="Remover projeto" class="text-slate-400 hover:text-red-600 p-1">✕</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+              <div>
+                <label for="b8_pac_experiencia" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Resultado recente no Novo PAC: <span class="text-red-500">*</span>
+                </label>
+                <select id="b8_pac_experiencia" name="b8_pac_experiencia" required class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+                  <option value="">Selecione...</option>
+                  <option value="Aprovado/selecionado">Aprovado / Selecionado com proposta</option>
+                  <option value="Cadastrado e reprovado/inabilitado">Cadastrou proposta, mas foi Inabilitado/Reprovado</option>
+                  <option value="Desistiu">Iniciou cadastro, porém desistiu no processo</option>
+                  <option value="Nao se inscreveu">Não se inscreveu (falta de equipe, tempo ou projetos)</option>
+                  <option value="Nao se aplica">Não se enquadrava nos critérios do edital</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Principal motivo de inabilitação ou desistência:
+                </label>
+                <select name="b8_pac_motivo_principal" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+                  <option value="">Selecione se aplicável...</option>
+                  <option value="Falta de projetos de engenharia">Falta de projetos executivos no nível exigido</option>
+                  <option value="Prazo exiguo">Prazos curtos no Transferegov</option>
+                  <option value="Licenciamento ou regularizacao fundiaria">Pendências de licenciamento ou terreno</option>
+                  <option value="CAUC / SIAFI / CADIN">Restrições fiscais / Inadimplência CAUC</option>
+                  <option value="Contrapartida inviavel">Contrapartida financeira inviável</option>
+                  <option value="Nao se aplica">Não se aplica</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- BLOCO LATERAL DE FORA COM EXPLICAÇÃO COMPLETA DO TRANSFEREGOV -->
+        <aside class="lg:col-span-4 bg-white p-4 rounded-2xl border border-purple-200 shadow-sm text-xs space-y-3">
+          <div class="flex items-center gap-2 pb-2 border-b border-purple-100">
+            <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+            <h4 class="font-bold text-purple-950 uppercase tracking-wider text-[11px]">Termos — Captação & PAC</h4>
+          </div>
+          <div class="space-y-2.5 text-[11px] text-slate-600 leading-relaxed">
+            <div>
+              <strong class="text-purple-900 block">Transferegov:</strong>
+              Plataforma digital integrada do Governo Federal (antigo Plataforma +Brasil/SICONV) utilizada para operacionalizar todas as transferências de recursos da União (emendas, convênios, Novo PAC e repasses do Ministério das Cidades). É onde a prefeitura cadastra a proposta, envia os projetos, cumpre as cláusulas suspensivas e realiza a prestação de contas das obras.
+            </div>
+            <div>
+              <strong class="text-purple-900 block">Projeto Básico vs. Executivo:</strong>
+              O Básico estabelece a viabilidade técnica e o orçamento geral da intervenção. O Executivo traz plantas com detalhamento completo, especificações milimétricas e cálculos de engenharia que habilitam o início das obras na Caixa.
+            </div>
+            <div>
+              <strong class="text-purple-900 block">CAUC / SIAFI / CADIN:</strong>
+              Sistemas de registro da regularidade fiscal, jurídica e contábil municipal junto à União. Bloqueiam automaticamente transferências voluntárias se houver certidões vencidas.
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- TÓPICO: APOIO NECESSÁRIO E FECHAMENTO -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <section id="bloco11_apoio" class="secao-formulario lg:col-span-12 bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-slate-200" data-base-title="Apoio Necessário e Fechamento">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+            <div class="flex items-center gap-3">
+              <span class="secao-badge w-8 h-8 rounded-xl bg-blue-100 text-blue-800 font-black text-sm flex items-center justify-center border border-blue-200 shadow-sm">9</span>
+              <div>
+                <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">Apoio Necessário e Fechamento</h3>
+                <p class="text-xs text-slate-500">Demandas prioritárias e mensagem para os órgãos federais</p>
+              </div>
+            </div>
+            <span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Obrigatório</span>
+          </div>
+
+          <div class="space-y-4 text-xs">
+            <div>
+              <label class="block font-bold text-slate-700 uppercase tracking-wider mb-2">
+                Que tipo de apoio ajudaria mais o seu município? (Múltipla escolha)
+              </label>
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b11_apoio_tipos" value="Banco de projetos padronizados" class="custom-checkbox">
+                  <span>Banco de projetos padronizados</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b11_apoio_tipos" value="Apoio tecnico em engenharia" class="custom-checkbox">
+                  <span>Apoio técnico de engenharia (UNIVASF/MCID)</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b11_apoio_tipos" value="Regularizacao ambiental e fundiaria" class="custom-checkbox">
+                  <span>Regularização ambiental e fundiária</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b11_apoio_tipos" value="Capacitacao Transferegov" class="custom-checkbox">
+                  <span>Capacitação no Transferegov</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b11_apoio_tipos" value="Apoio juridico e institucional" class="custom-checkbox">
+                  <span>Apoio jurídico e consórcios</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b11_apoio_tipos" value="Sustentabilidade financeira de taxas" class="custom-checkbox">
+                  <span>Sustentabilidade e taxas municipais</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label for="b11_problema_12meses" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Se pudesse resolver apenas 1 problema nos próximos 12 meses, qual seria?
+              </label>
+              <input type="text" id="b11_problema_12meses" name="b11_problema_12meses" placeholder="Prioridade imediata número 1..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+            </div>
+
+            <div>
+              <label for="b11_desabafo_ministerio" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Recado para o Ministério das Cidades / Equipe Federal:
+              </label>
+              <textarea id="b11_desabafo_ministerio" name="b11_desabafo_ministerio" rows="2.5" placeholder="O que Brasília precisa saber sobre a realidade do seu município? Barreiras invisíveis..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800"></textarea>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- TÓPICO: REGISTRO DO ENTREVISTADOR -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <section id="bloco12_entrevistador" class="secao-formulario lg:col-span-12 bg-slate-100 rounded-2xl p-5 sm:p-7 shadow-sm border border-slate-300" data-base-title="Registro do Entrevistador">
+          <div class="flex items-center justify-between border-b border-slate-300 pb-3 mb-4">
+            <div class="flex items-center gap-3">
+              <span class="secao-badge w-8 h-8 rounded-xl bg-slate-800 text-white font-black text-sm flex items-center justify-center shadow-sm">10</span>
+              <div>
+                <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">Registro do Entrevistador</h3>
+                <p class="text-xs text-slate-500">Uso exclusivo da equipe técnica de campo (NIESADT / UNIVASF / MCID)</p>
+              </div>
+            </div>
+            <span class="bg-slate-200 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Técnico</span>
+          </div>
+
+          <div class="space-y-4 text-xs">
+            <div>
+              <label for="b12_nome_entrevistador" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Nome do Entrevistador / Pesquisador:
+              </label>
+              <input type="text" id="b12_nome_entrevistador" name="b12_nome_entrevistador" placeholder="Nome completo do entrevistador/pesquisador" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800">
+            </div>
+
+            <div>
+              <label for="b12_obs_entrevistador" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Observações técnicas sobre arranjo, postura do gestor ou impasses relatados:
+              </label>
+              <textarea id="b12_obs_entrevistador" name="b12_obs_entrevistador" rows="2.5" placeholder="Notas sobre viabilidade técnica, perfil da equipe local, impressões da escuta..." class="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800"></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Indicar para aprofundamento?</label>
+                <div class="flex items-center gap-4 pt-1">
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="b12_aprofundamento" value="Sim" class="custom-checkbox"> <span>Sim</span></label>
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="b12_aprofundamento" value="Nao" class="custom-checkbox"> <span>Não</span></label>
+                </div>
+              </div>
+
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Necessita análise de especialista?</label>
+                <div class="flex items-center gap-3 pt-1">
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="b12_analise_especialista" value="Sim" class="custom-checkbox"> <span>Sim</span></label>
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="b12_analise_especialista" value="Nao" class="custom-checkbox"> <span>Não</span></label>
+                  <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="b12_analise_especialista" value="A avaliar" class="custom-checkbox"> <span>A avaliar</span></label>
+                </div>
+              </div>
+
+              <div>
+                <label for="b12_tema_capacitacao" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Tema sugerido para capacitação:</label>
+                <input type="text" id="b12_tema_capacitacao" name="b12_tema_capacitacao" placeholder="Ex: Gestão de Perdas, Transferegov" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs">
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- PAINEL INFERIOR: AÇÕES -->
+      <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
+        <div>
+          <h4 class="text-sm font-bold text-slate-900">Finalização da Escuta Municipal</h4>
+          <p class="text-xs text-slate-500">Salva no banco local deste dispositivo e reinicia a tela para o próximo município.</p>
+        </div>
+        <div class="flex items-center flex-wrap gap-3 w-full sm:w-auto">
+          <button type="button" onclick="confirmResetDraft()" class="px-4 py-2.5 text-xs font-semibold text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl border border-slate-200 transition">
+            Limpar Rascunho
+          </button>
+
+          <button type="button" onclick="exportCurrentToCSV()" class="px-4 py-2.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl border border-slate-300 transition flex items-center gap-1.5 shadow-sm">
+            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            <span>Baixar CSV Desta Escuta</span>
+          </button>
+
+          <button type="button" onclick="finalizeInterview()" class="flex-1 sm:flex-initial px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-brand-700 to-blue-600 hover:from-brand-800 hover:to-blue-700 rounded-xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer transform hover:-translate-y-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+            <span>Finalizar e Gravar Escuta</span>
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- RODAPÉ -->
+  <footer class="bg-slate-900 text-slate-400 py-8 border-t border-slate-800 text-xs mt-12 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div>
+        <p class="text-white font-medium">Projeto Saneamento Vivo | NIESADT | UNIVASF</p>
+        <p class="text-slate-400">Em cooperação técnica com a Secretaria Nacional de Saneamento Ambiental | Ministério das Cidades</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="button" onclick="exportBackupJSON()" class="hover:text-white underline cursor-pointer">Backup JSON</button>
+        <span>•</span>
+        <button type="button" onclick="openImportJSONModal()" class="hover:text-white underline cursor-pointer">Mesclar JSON</button>
+        <span>•</span>
+        <button type="button" onclick="openResetAllModal()" class="text-red-400 hover:text-red-300 underline cursor-pointer">Limpar Banco</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAIS (HISTÓRICO, SUCESSO, RESET, IMPORTAR) -->
+  <div id="modalHistory" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
+    <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl border border-slate-200 flex flex-col max-h-[90vh] overflow-hidden">
+      <div class="p-4 sm:p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="p-2 bg-blue-100 text-blue-800 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Escutas Concluídas Registradas</h3>
+            <p class="text-xs text-slate-500">Dados salvos com segurança no armazenamento local</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeHistoryModal()" class="text-slate-400 hover:text-slate-700 p-1 rounded-lg">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="p-3 border-b border-slate-200 bg-white flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="relative w-full sm:w-72">
+          <input type="text" id="historySearchInput" oninput="renderHistoryTable()" placeholder="Buscar por município ou participante..." class="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg">
+          <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button type="button" onclick="exportAllToCSV()" class="px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg flex items-center gap-1 shadow-sm">
+            Exportar Todas (.CSV)
+          </button>
+          <button type="button" onclick="exportBackupJSON()" class="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center gap-1 border border-slate-300">
+            Backup JSON
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-4">
+        <div class="overflow-x-auto rounded-lg border border-slate-200">
+          <table class="min-w-full divide-y divide-slate-200 text-xs">
+            <thead class="bg-slate-50 text-slate-700 font-bold uppercase tracking-wider">
+              <tr>
+                <th scope="col" class="py-2.5 px-3 text-left">ID / Data</th>
+                <th scope="col" class="py-2.5 px-3 text-left">Município / UF</th>
+                <th scope="col" class="py-2.5 px-3 text-left">Participante</th>
+                <th scope="col" class="py-2.5 px-3 text-left">Eixos com Problema</th>
+                <th scope="col" class="py-2.5 px-3 text-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody" class="bg-white divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="p-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs text-slate-500">
+        <span id="historyTotalCountText">Total de 0 escuta(s) registradas</span>
+        <button type="button" onclick="closeHistoryModal()" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg font-medium">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalSuccess" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 border border-slate-200 text-center">
+      <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full mx-auto flex items-center justify-center mb-3">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <h3 class="text-lg font-black text-slate-900 mb-1">Escuta Registrada com Sucesso!</h3>
+      <p class="text-xs text-slate-500 mb-4">Dados salvos com segurança no armazenamento local.</p>
+      
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-left text-xs mb-4 space-y-1">
+        <div><strong>ID da Escuta:</strong> <span id="successModalId" class="font-mono text-blue-700 font-bold"></span></div>
+        <div><strong>Município:</strong> <span id="successModalCity"></span></div>
+        <div><strong>Participante:</strong> <span id="successModalParticipant"></span></div>
+      </div>
+
+      <div class="space-y-2">
+        <button type="button" id="btnDownloadSingleSuccess" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+          Baixar CSV Desta Escuta Imediatamente
+        </button>
+        <button type="button" onclick="closeSuccessModal()" class="w-full py-2.5 bg-brand-700 hover:bg-brand-800 text-white rounded-xl text-xs font-bold transition">
+          Iniciar Próxima Escuta
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalResetAll" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 border border-slate-200">
+      <h3 class="text-base font-bold text-slate-900 mb-1">Atenção: Limpeza Completa</h3>
+      <p class="text-xs text-slate-600 mb-4">Esta ação apagará todas as escutas salvas neste computador.</p>
+      <div class="mb-4">
+        <label for="resetConfirmText" class="block text-xs font-bold text-slate-700 mb-1">Digite <span class="text-red-600 font-black">LIMPAR</span>:</label>
+        <input type="text" id="resetConfirmText" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-sm text-center font-bold tracking-widest text-red-600 uppercase">
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="button" onclick="closeResetAllModal()" class="flex-1 py-2 bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">Cancelar</button>
+        <button type="button" onclick="executeResetAll()" class="flex-1 py-2 bg-red-600 text-white rounded-lg text-xs font-bold">Apagar Tudo</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalImportJSON" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 no-print">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 border border-slate-200">
+      <h3 class="text-base font-bold text-slate-900 mb-1">Mesclar Escutas via JSON</h3>
+      <p class="text-xs text-slate-600 mb-4">Selecione um arquivo .json para integrar as escutas ao banco.</p>
+      <input type="file" id="jsonFileInput" accept=".json" class="block w-full text-xs text-slate-500 mb-4">
+      <div class="flex items-center gap-3">
+        <button type="button" onclick="closeImportJSONModal()" class="flex-1 py-2 bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">Cancelar</button>
+        <button type="button" onclick="executeImportJSON()" class="flex-1 py-2 bg-sky-600 text-white rounded-lg text-xs font-bold">Importar Dados</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    const STORAGE_KEY_DRAFT = 'sanea_draft_v7';
+    const STORAGE_KEY_LIST = 'sanea_interviews_v7';
+
+    let lastSaveTimestamp = Date.now();
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const dataInput = document.getElementById('b1_data');
+      if (dataInput && !dataInput.value) {
+        dataInput.value = new Date().toISOString().split('T')[0];
+      }
+
+      handleTriageChange();
+      loadDraftFromStorage();
+      updateSavedCountBadge();
+      setupFormListeners();
+      setInterval(updateSaveStatusIndicator, 5000);
+      recalcularNumeracaoTopicos();
+      updateProgressBar();
+    });
+
+    function recalcularNumeracaoTopicos() {
+      const secoesVisiveis = document.querySelectorAll('section.secao-formulario:not(.hidden)');
+      
+      secoesVisiveis.forEach((secao, idx) => {
+        const num = idx + 1;
+        const badge = secao.querySelector('.secao-badge');
+        if (badge) {
+          badge.textContent = num;
+        }
+
+        const titulo = secao.querySelector('.secao-titulo');
+        const baseTitle = secao.getAttribute('data-base-title');
+        if (titulo && baseTitle) {
+          titulo.textContent = baseTitle;
+        }
+      });
+    }
+
+    function addProjectRow(data = {}) {
+      const tbody = document.getElementById('projectsTableBody');
+      const tr = document.createElement('tr');
+      tr.className = 'project-row';
+      tr.innerHTML = `
+        <td class="py-1.5 px-2"><input type="text" name="proj_objeto[]" value="${data.objeto || ''}" placeholder="Ex: Ampliação de ETA / Esgoto" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+        <td class="py-1.5 px-2"><input type="text" name="proj_situacao[]" value="${data.situacao || ''}" placeholder="Ex: Projeto básico / Executivo" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+        <td class="py-1.5 px-2"><input type="text" name="proj_valor[]" value="${data.valor || ''}" placeholder="Ex: R$ 3,5M - PAC / MCID" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+        <td class="py-1.5 px-2"><input type="text" name="proj_impedimento[]" value="${data.impedimento || ''}" placeholder="Ex: Falta de licença ambiental" class="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-xs"></td>
+        <td class="py-1.5 px-1 text-center">
+          <button type="button" onclick="removeProjectRow(this)" title="Remover projeto" class="text-slate-400 hover:text-red-600 p-1">✕</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+      saveCurrentDraft();
+    }
+
+    function removeProjectRow(button) {
+      const row = button.closest('tr');
+      const tbody = document.getElementById('projectsTableBody');
+      if (tbody.querySelectorAll('tr').length > 1) {
+        row.remove();
+        saveCurrentDraft();
+      } else {
+        showToast('Mantenha ao menos uma linha de projeto.', 'warning');
+      }
+    }
+
+    function getProjectsData() {
+      const rows = document.querySelectorAll('#projectsTableBody tr.project-row');
+      const projects = [];
+      rows.forEach(r => {
+        const obj = r.querySelector('[name="proj_objeto[]"]').value.trim();
+        const sit = r.querySelector('[name="proj_situacao[]"]').value.trim();
+        const val = r.querySelector('[name="proj_valor[]"]').value.trim();
+        const imp = r.querySelector('[name="proj_impedimento[]"]').value.trim();
+        if (obj || sit || val || imp) {
+          projects.push({ objeto: obj, situacao: sit, valor: val, impedimento: imp });
+        }
+      });
+      return projects;
+    }
+
+    function populateProjectsData(projects) {
+      const tbody = document.getElementById('projectsTableBody');
+      tbody.innerHTML = '';
+      if (!projects || projects.length === 0) {
+        addProjectRow();
+        return;
+      }
+      projects.forEach(p => addProjectRow(p));
+    }
+
+    function handleTriageChange() {
+      const chkAgua = document.getElementById('triage_agua').checked;
+      const chkEsgoto = document.getElementById('triage_esgoto').checked;
+      const chkResiduos = document.getElementById('triage_residuos').checked;
+      const chkDrenagem = document.getElementById('triage_drenagem').checked;
+      const chkNenhum = document.getElementById('triage_nenhum');
+
+      if (chkAgua || chkEsgoto || chkResiduos || chkDrenagem) {
+        chkNenhum.checked = false;
+      }
+
+      toggleRowVisibility('row_agua', 'bloco3_agua', chkAgua);
+      toggleRowVisibility('row_esgoto', 'bloco4_esgoto', chkEsgoto);
+      toggleRowVisibility('row_residuos', 'bloco5_residuos', chkResiduos);
+      toggleRowVisibility('row_drenagem', 'bloco6_drenagem', chkDrenagem);
+
+      recalcularNumeracaoTopicos();
+      saveCurrentDraft();
+      updateProgressBar();
+    }
+
+    function handleTriageNoneChange() {
+      const chkNenhum = document.getElementById('triage_nenhum').checked;
+      if (chkNenhum) {
+        document.getElementById('triage_agua').checked = false;
+        document.getElementById('triage_esgoto').checked = false;
+        document.getElementById('triage_residuos').checked = false;
+        document.getElementById('triage_drenagem').checked = false;
+
+        toggleRowVisibility('row_agua', 'bloco3_agua', false);
+        toggleRowVisibility('row_esgoto', 'bloco4_esgoto', false);
+        toggleRowVisibility('row_residuos', 'bloco5_residuos', false);
+        toggleRowVisibility('row_drenagem', 'bloco6_drenagem', false);
+      }
+      
+      recalcularNumeracaoTopicos();
+      saveCurrentDraft();
+      updateProgressBar();
+    }
+
+    function toggleRowVisibility(rowId, sectionId, show) {
+      const rowEl = document.getElementById(rowId);
+      const secEl = document.getElementById(sectionId);
+      if (!rowEl) return;
+      if (show) {
+        rowEl.classList.remove('hidden');
+        if (secEl) secEl.classList.remove('hidden');
+      } else {
+        rowEl.classList.add('hidden');
+        if (secEl) secEl.classList.add('hidden');
+      }
+    }
+
+    function closeConditionalBlock(axis) {
+      if (axis === 'Agua') document.getElementById('triage_agua').checked = false;
+      if (axis === 'Esgoto') document.getElementById('triage_esgoto').checked = false;
+      if (axis === 'Residuos') document.getElementById('triage_residuos').checked = false;
+      if (axis === 'Drenagem') document.getElementById('triage_drenagem').checked = false;
+      handleTriageChange();
+    }
+
+    function serializeFormData() {
+      const form = document.getElementById('saneaForm');
+      const data = {};
+      const inputs = form.querySelectorAll('input:not([name^="proj_"]), select, textarea');
+
+      inputs.forEach(input => {
+        if (!input.name) return;
+
+        if (input.type === 'checkbox') {
+          if (!data[input.name]) data[input.name] = [];
+          if (input.checked) data[input.name].push(input.value);
+        } else if (input.type === 'radio') {
+          if (input.checked) data[input.name] = input.value;
+        } else {
+          data[input.name] = input.value;
+        }
+      });
+
+      data.projetos_pac = getProjectsData();
+      return data;
+    }
+
+    function populateForm(data) {
+      if (!data) return;
+      const form = document.getElementById('saneaForm');
+      form.reset();
+
+      Object.keys(data).forEach(key => {
+        if (key === 'projetos_pac') {
+          populateProjectsData(data[key]);
+          return;
+        }
+        const val = data[key];
+        const elements = form.querySelectorAll(`[name="${key}"]`);
+        if (elements.length === 0) return;
+
+        if (elements[0].type === 'checkbox') {
+          elements.forEach(cb => {
+            cb.checked = Array.isArray(val) && val.includes(cb.value);
+          });
+        } else if (elements[0].type === 'radio') {
+          elements.forEach(rb => {
+            rb.checked = (rb.value === val);
+          });
+        } else {
+          elements[0].value = val || '';
+        }
+      });
+
+      handleTriageChange();
+    }
+
+    function setupFormListeners() {
+      const form = document.getElementById('saneaForm');
+      form.addEventListener('input', () => {
+        saveCurrentDraft();
+        updateProgressBar();
+      });
+      form.addEventListener('change', () => {
+        saveCurrentDraft();
+        updateProgressBar();
+      });
+    }
+
+    function saveCurrentDraft() {
+      try {
+        const data = serializeFormData();
+        data._updatedAt = new Date().toISOString();
+        localStorage.setItem(STORAGE_KEY_DRAFT, JSON.stringify(data));
+        lastSaveTimestamp = Date.now();
+        updateSaveStatusIndicator();
+      } catch (err) {
+        console.warn('Falha no salvamento automático:', err);
+      }
+    }
+
+    function loadDraftFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_DRAFT);
+        if (raw) {
+          const data = JSON.parse(raw);
+          if (data.b1_municipio || data.b1_nome || (data.triage_eixos && data.triage_eixos.length > 0)) {
+            populateForm(data);
+            const banner = document.getElementById('recoveredDraftBanner');
+            if (banner) banner.classList.remove('hidden');
+            showToast('Rascunho recuperado.', 'info');
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function updateSaveStatusIndicator() {
+      const indicatorText = document.getElementById('saveStatusText');
+      if (!indicatorText) return;
+      const secondsAgo = Math.round((Date.now() - lastSaveTimestamp) / 1000);
+      indicatorText.textContent = secondsAgo < 5 ? 'Salvo agora' : `Salvo há ${secondsAgo}s`;
+    }
+
+    function updateProgressBar() {
+      let total = 8;
+      let filled = 0;
+
+      const fields = ['b1_municipio', 'b1_uf', 'b1_porte', 'b1_nome', 'b1_cargo', 'b1_whatsapp', 'b1_email', 'b7_pmsb_status'];
+      fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.value.trim() !== '') filled++;
+      });
+
+      const pct = Math.min(100, Math.round((filled / total) * 100));
+      const bar = document.getElementById('formProgressBar');
+      const txt = document.getElementById('progressPercentText');
+      if (bar) bar.style.width = `${pct}%`;
+      if (txt) txt.textContent = `${pct}%`;
+    }
+
+    function finalizeInterview() {
+      const data = serializeFormData();
+
+      if (!data.b1_municipio || !data.b1_uf || !data.b1_nome || !data.b1_cargo || !data.b1_porte || !data.b1_whatsapp || !data.b1_email) {
+        showToast('Preencha os campos obrigatórios da Identificação.', 'error');
+        document.getElementById('bloco1').scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+
+      if (!data.b7_pmsb_status) {
+        showToast('Informe a situação do PMSB.', 'error');
+        document.getElementById('bloco7_pmsb').scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+
+      if (!data.b8_pac_experiencia) {
+        showToast('Informe o resultado no Novo PAC.', 'error');
+        document.getElementById('bloco8_investimentos').scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+
+      const now = new Date();
+      const dateStr = now.toISOString().slice(0,10).replace(/-/g, '');
+      const ufClean = (data.b1_uf || 'BR').toUpperCase();
+      const rnd = Math.floor(1000 + Math.random() * 9000);
+      const interviewId = `ESC-${dateStr}-${ufClean}-${rnd}`;
+
+      const record = {
+        id: interviewId,
+        createdAt: now.toISOString(),
+        ...data
+      };
+
+      const list = getStoredInterviews();
+      list.unshift(record);
+      saveStoredInterviews(list);
+
+      localStorage.removeItem(STORAGE_KEY_DRAFT);
+      document.getElementById('saneaForm').reset();
+      populateProjectsData([]);
+      
+      document.getElementById('triage_agua').checked = true;
+      document.getElementById('triage_esgoto').checked = true;
+      document.getElementById('triage_residuos').checked = true;
+      document.getElementById('triage_drenagem').checked = true;
+      document.getElementById('triage_nenhum').checked = false;
+      handleTriageChange();
+      
+      updateProgressBar();
+      updateSavedCountBadge();
+
+      const banner = document.getElementById('recoveredDraftBanner');
+      if (banner) banner.classList.add('hidden');
+
+      showSuccessModal(record);
+    }
+
+    function getStoredInterviews() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_LIST);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveStoredInterviews(list) {
+      try {
+        localStorage.setItem(STORAGE_KEY_LIST, JSON.stringify(list));
+      } catch (e) {
+        showToast('Erro ao gravar no banco local.', 'error');
+      }
+    }
+
+    function updateSavedCountBadge() {
+      const list = getStoredInterviews();
+      const badge = document.getElementById('savedCountBadge');
+      if (badge) badge.textContent = list.length;
+    }
+
+    function confirmResetDraft() {
+      if (confirm('Deseja limpar todos os dados do rascunho em andamento?')) {
+        localStorage.removeItem(STORAGE_KEY_DRAFT);
+        document.getElementById('saneaForm').reset();
+        populateProjectsData([]);
+        document.getElementById('triage_agua').checked = true;
+        document.getElementById('triage_esgoto').checked = true;
+        document.getElementById('triage_residuos').checked = true;
+        document.getElementById('triage_drenagem').checked = true;
+        document.getElementById('triage_nenhum').checked = false;
+        handleTriageChange();
+        updateProgressBar();
+        const banner = document.getElementById('recoveredDraftBanner');
+        if (banner) banner.classList.add('hidden');
+        showToast('Rascunho limpo com sucesso.', 'info');
+      }
+    }
+
+    function formatCSVField(val) {
+      if (val === null || val === undefined) return '""';
+      if (Array.isArray(val)) {
+        if (val.length > 0 && typeof val[0] === 'object') {
+          val = val.map((p, idx) => `[${idx+1}] Objeto: ${p.objeto || '-'} | Situação: ${p.situacao || '-'} | Valor: ${p.valor || '-'} | Trava: ${p.impedimento || '-'}`).join(' // ');
+        } else {
+          val = val.join(', ');
+        }
+      }
+      val = String(val).trim();
+      val = val.replace(/\r?\n|\r/g, ' / ');
+      val = val.replace(/"/g, '""');
+      return `"${val}"`;
+    }
+
+    function getCSVHeaders() {
+      return [
+        'ID_Escuta', 'Data_Hora_Registro', 'Data_Escuta', 'Municipio', 'UF', 'Porte_Populacional',
+        'Nome_Participante', 'Cargo_Funcao', 'Orgao_Secretaria', 'Perfil_Participacao', 'WhatsApp', 'Email',
+        'Agua_Titular', 'Agua_Prestador', 'Agua_Regulacao',
+        'Esgoto_Titular', 'Esgoto_Prestador', 'Esgoto_Regulacao',
+        'Residuos_Titular', 'Residuos_Prestador', 'Residuos_Regulacao',
+        'Drenagem_Titular', 'Drenagem_Prestador', 'Drenagem_Regulacao',
+        'Eixos_Triagem_Gargalos',
+        // Água
+        'Agua_Cadeia_Afetada', 'Agua_Mesma_Inst_Produz_Distribui', 'Agua_Fonte_Principal', 'Agua_Divisao_Obs', 'Agua_Gargalos_Checklist', 'Agua_Descricao_Dor',
+        // Esgoto
+        'Esgoto_Cadeia_Afetada', 'Esgoto_Situacao_Cobertura', 'Esgoto_Sistemas_Individuais_Fossas', 'Esgoto_Gargalos_Checklist', 'Esgoto_Descricao_Dor',
+        // Resíduos
+        'Residuos_Cobranca_Status', 'Residuos_Destinacao_Final', 'Residuos_Frota_Status', 'Residuos_Catadores_Cooperativa', 'Residuos_Gargalos_Checklist', 'Residuos_Descricao_Dor',
+        // Drenagem
+        'Drenagem_Equipe_Tecnica', 'Drenagem_Cadastro_Rede', 'Drenagem_Gravidade_Alagamentos', 'Drenagem_Pontos_Criticos_Locais', 'Drenagem_Gargalos_Checklist', 'Drenagem_Descricao_Dor',
+        // PMSB & PAC
+        'PMSB_Situacao', 'PMSB_Orienta_Investimentos', 'PMSB_Obstaculos_Travas',
+        'Projetos_Investimentos_Detalhes', 'NovoPAC_Resultado', 'NovoPAC_Motivo_Inabilitacao',
+        // Apoio
+        'Apoio_Tipos_Demandados', 'Acao_Urgente_12_Meses', 'Recado_Ministerio_Cidades',
+        // Entrevistador
+        'Nome_Entrevistador', 'Entrevistador_Observacoes', 'Entrevistador_Indicar_Aprofundamento', 'Entrevistador_Necessita_Especialista', 'Entrevistador_Tema_Capacitacao'
+      ];
+    }
+
+    function convertRecordToCSVRow(rec) {
+      const row = [
+        rec.id || '', rec.createdAt || '', rec.b1_data || '', rec.b1_municipio || '', rec.b1_uf || '', rec.b1_porte || '',
+        rec.b1_nome || '', rec.b1_cargo || '', rec.b1_orgao || '', rec.b1_participacao || '', rec.b1_whatsapp || '', rec.b1_email || '',
+        rec.b2_inst_agua_titular || '', rec.b2_inst_agua_prestador || '', rec.b2_inst_agua_regulacao || '',
+        rec.b2_inst_esgoto_titular || '', rec.b2_inst_esgoto_prestador || '', rec.b2_inst_esgoto_regulacao || '',
+        rec.b2_inst_residuos_titular || '', rec.b2_inst_residuos_prestador || '', rec.b2_inst_residuos_regulacao || '',
+        rec.b2_inst_drenagem_titular || '', rec.b2_inst_drenagem_prestador || '', rec.b2_inst_drenagem_regulacao || '',
+        rec.triage_eixos || '',
+        // Água
+        rec.b3_agua_cadeia || '', rec.b3_agua_mesma_inst || '', rec.b3_agua_fonte || '', rec.b3_agua_divisao_obs || '', rec.b3_agua_gargalos || '', rec.b3_agua_dor || '',
+        // Esgoto
+        rec.b4_esgoto_cadeia || '', rec.b4_esgoto_situacao || '', rec.b4_esgoto_descentralizado || '', rec.b4_esgoto_gargalos || '', rec.b4_esgoto_dor || '',
+        // Resíduos
+        rec.b5_res_cobranca_status || '', rec.b5_res_destinacao_status || '', rec.b5_res_frota_status || '', rec.b5_res_catadores_status || '', rec.b5_res_gargalos || '', rec.b5_res_dor || '',
+        // Drenagem
+        rec.b6_dren_equipe || '', rec.b6_dren_cadastro || '', rec.b6_dren_alagamentos || '', rec.b6_dren_localidades || '', rec.b6_dren_gargalos || '', rec.b6_dren_dor || '',
+        // PMSB & PAC
+        rec.b7_pmsb_status || '', rec.b7_pmsb_orienta || '', rec.b7_pmsb_obstaculos || '',
+        rec.projetos_pac || '', rec.b8_pac_experiencia || '', rec.b8_pac_motivo_principal || '',
+        // Apoio
+        rec.b11_apoio_tipos || '', rec.b11_problema_12meses || '', rec.b11_desabafo_ministerio || '',
+        // Entrevistador
+        rec.b12_nome_entrevistador || '', rec.b12_obs_entrevistador || '', rec.b12_aprofundamento || '', rec.b12_analise_especialista || '', rec.b12_tema_capacitacao || ''
+      ];
+
+      return row.map(formatCSVField).join(';');
+    }
+
+    function downloadFile(content, fileName, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 200);
+    }
+
+    function exportAllToCSV() {
+      const list = getStoredInterviews();
+      if (list.length === 0) {
+        showToast('Nenhuma escuta gravada para exportar.', 'warning');
+        return;
+      }
+
+      const headers = getCSVHeaders();
+      const rows = [headers.map(h => `"${h}"`).join(';')];
+      list.forEach(rec => rows.push(convertRecordToCSVRow(rec)));
+
+      const csvContent = '\uFEFF' + rows.join('\r\n');
+      const today = new Date().toISOString().slice(0,10);
+      downloadFile(csvContent, `sanea_brasil_todas_escutas_${today}.csv`, 'text/csv;charset=utf-8;');
+      showToast(`${list.length} escuta(s) exportada(s) com sucesso!`, 'success');
+    }
+
+    function exportCurrentToCSV() {
+      const data = serializeFormData();
+      if (!data.b1_municipio && !data.b1_nome) {
+        showToast('Preencha ao menos o município antes de exportar.', 'warning');
+        return;
+      }
+
+      const mockRecord = {
+        id: 'RASCUNHO-' + (data.b1_municipio || 'AVULSO').toUpperCase(),
+        createdAt: new Date().toISOString(),
+        ...data
+      };
+
+      const headers = getCSVHeaders();
+      const rows = [
+        headers.map(h => `"${h}"`).join(';'),
+        convertRecordToCSVRow(mockRecord)
+      ];
+
+      const csvContent = '\uFEFF' + rows.join('\r\n');
+      const filename = `escuta_${(data.b1_municipio || 'atual').toLowerCase().replace(/\s+/g, '_')}_${mockRecord.id}.csv`;
+      downloadFile(csvContent, filename, 'text/csv;charset=utf-8;');
+      showToast('Escuta atual exportada para CSV!', 'success');
+    }
+
+    function exportBackupJSON() {
+      const list = getStoredInterviews();
+      const dataStr = JSON.stringify(list, null, 2);
+      const today = new Date().toISOString().slice(0,10);
+      downloadFile(dataStr, `sanea_brasil_backup_${today}.json`, 'application/json');
+      showToast('Backup JSON exportado!', 'success');
+    }
+
+    function openHistoryModal() {
+      renderHistoryTable();
+      document.getElementById('modalHistory').classList.remove('hidden');
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('modalHistory').classList.add('hidden');
+    }
+
+    function renderHistoryTable() {
+      const list = getStoredInterviews();
+      const tbody = document.getElementById('historyTableBody');
+      const search = (document.getElementById('historySearchInput').value || '').toLowerCase();
+      tbody.innerHTML = '';
+
+      const filtered = list.filter(item => {
+        const mun = (item.b1_municipio || '').toLowerCase();
+        const nome = (item.b1_nome || '').toLowerCase();
+        const uf = (item.b1_uf || '').toLowerCase();
+        return mun.includes(search) || nome.includes(search) || uf.includes(search);
+      });
+
+      document.getElementById('historyTotalCountText').textContent = `Exibindo ${filtered.length} de ${list.length} escuta(s)`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400">Nenhuma escuta encontrada.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(rec => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition';
+        const dataFormatada = rec.createdAt ? new Date(rec.createdAt).toLocaleDateString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '-';
+        const eixos = Array.isArray(rec.triage_eixos) ? rec.triage_eixos.join(', ') : (rec.triage_eixos || 'Geral');
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3">
+            <div class="font-mono text-blue-700 font-bold text-[11px]">${rec.id || 'S/N'}</div>
+            <div class="text-[10px] text-slate-400">${dataFormatada}</div>
+          </td>
+          <td class="py-2.5 px-3">
+            <div class="font-semibold text-slate-800">${rec.b1_municipio || '-'} / ${rec.b1_uf || '-'}</div>
+            <div class="text-[10px] text-slate-500">${rec.b1_porte || ''}</div>
+          </td>
+          <td class="py-2.5 px-3">
+            <div class="font-medium text-slate-800">${rec.b1_nome || '-'}</div>
+            <div class="text-[10px] text-slate-500">${rec.b1_cargo || ''}</div>
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="inline-block px-2 py-0.5 rounded text-[10px] bg-slate-100 text-slate-700 border border-slate-200 font-medium">${eixos}</span>
+          </td>
+          <td class="py-2.5 px-3 text-center">
+            <div class="flex items-center justify-center gap-1.5">
+              <button type="button" onclick="loadInterviewToForm('${rec.id}')" title="Carregar no formulário" class="p-1 text-blue-600 hover:bg-blue-50 rounded">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+              </button>
+              <button type="button" onclick="downloadSingleCSV('${rec.id}')" title="Baixar CSV" class="p-1 text-emerald-600 hover:bg-emerald-50 rounded">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              </button>
+              <button type="button" onclick="deleteInterview('${rec.id}')" title="Excluir" class="p-1 text-red-500 hover:bg-red-50 rounded">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function loadInterviewToForm(id) {
+      const list = getStoredInterviews();
+      const rec = list.find(r => r.id === id);
+      if (!rec) return;
+
+      if (confirm(`Carregar a escuta de ${rec.b1_municipio}? As alterações não salvas serão substituídas.`)) {
+        populateForm(rec);
+        closeHistoryModal();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast(`Escuta ${rec.id} carregada.`, 'info');
+      }
+    }
+
+    function downloadSingleCSV(id) {
+      const list = getStoredInterviews();
+      const rec = list.find(r => r.id === id);
+      if (!rec) return;
+
+      const headers = getCSVHeaders();
+      const rows = [
+        headers.map(h => `"${h}"`).join(';'),
+        convertRecordToCSVRow(rec)
+      ];
+
+      const csvContent = '\uFEFF' + rows.join('\r\n');
+      const filename = `escuta_${(rec.b1_municipio || 'registro').toLowerCase()}_${rec.id}.csv`;
+      downloadFile(csvContent, filename, 'text/csv;charset=utf-8;');
+    }
+
+    function deleteInterview(id) {
+      if (confirm('Deseja realmente remover esta escuta do banco local?')) {
+        let list = getStoredInterviews();
+        list = list.filter(r => r.id !== id);
+        saveStoredInterviews(list);
+        renderHistoryTable();
+        updateSavedCountBadge();
+        showToast('Escuta removida do banco.', 'info');
+      }
+    }
+
+    function showSuccessModal(rec) {
+      document.getElementById('successModalId').textContent = rec.id;
+      document.getElementById('successModalCity').textContent = `${rec.b1_municipio} - ${rec.b1_uf}`;
+      document.getElementById('successModalParticipant').textContent = `${rec.b1_nome} (${rec.b1_cargo})`;
+      
+      const btnDownload = document.getElementById('btnDownloadSingleSuccess');
+      btnDownload.onclick = () => {
+        downloadSingleCSV(rec.id);
+      };
+
+      document.getElementById('modalSuccess').classList.remove('hidden');
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('modalSuccess').classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openResetAllModal() {
+      document.getElementById('resetConfirmText').value = '';
+      document.getElementById('modalResetAll').classList.remove('hidden');
+    }
+
+    function closeResetAllModal() {
+      document.getElementById('modalResetAll').classList.add('hidden');
+    }
+
+    function executeResetAll() {
+      const text = document.getElementById('resetConfirmText').value.trim();
+      if (text !== 'LIMPAR') {
+        showToast('Digite LIMPAR para confirmar.', 'error');
+        return;
+      }
+
+      localStorage.removeItem(STORAGE_KEY_LIST);
+      localStorage.removeItem(STORAGE_KEY_DRAFT);
+      document.getElementById('saneaForm').reset();
+      populateProjectsData([]);
+      document.getElementById('triage_agua').checked = true;
+      document.getElementById('triage_esgoto').checked = true;
+      document.getElementById('triage_residuos').checked = true;
+      document.getElementById('triage_drenagem').checked = true;
+      document.getElementById('triage_nenhum').checked = false;
+      handleTriageChange();
+      updateProgressBar();
+      updateSavedCountBadge();
+      closeResetAllModal();
+      showToast('Banco local resetado.', 'info');
+    }
+
+    function openImportJSONModal() {
+      document.getElementById('jsonFileInput').value = '';
+      document.getElementById('modalImportJSON').classList.remove('hidden');
+    }
+
+    function closeImportJSONModal() {
+      document.getElementById('modalImportJSON').classList.add('hidden');
+    }
+
+    function executeImportJSON() {
+      const fileInput = document.getElementById('jsonFileInput');
+      if (!fileInput.files || fileInput.files.length === 0) {
+        showToast('Selecione um arquivo .json.', 'warning');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!Array.isArray(imported)) {
+            showToast('Arquivo inválido. Esperava-se uma lista de escutas.', 'error');
+            return;
+          }
+
+          const currentList = getStoredInterviews();
+          const existingIds = new Set(currentList.map(r => r.id));
+          let countAdded = 0;
+
+          imported.forEach(item => {
+            if (item.id && !existingIds.has(item.id)) {
+              currentList.push(item);
+              countAdded++;
+            }
+          });
+
+          saveStoredInterviews(currentList);
+          updateSavedCountBadge();
+          closeImportJSONModal();
+          showToast(`${countAdded} novas escutas mescladas!`, 'success');
+        } catch (err) {
+          showToast('Erro ao ler arquivo JSON.', 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      let bg = 'bg-slate-900 border-slate-700 text-white';
+      let icon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
+
+      if (type === 'success') {
+        bg = 'bg-emerald-800 border-emerald-600 text-white';
+        icon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />';
+      } else if (type === 'error') {
+        bg = 'bg-red-800 border-red-600 text-white';
+        icon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />';
+      } else if (type === 'warning') {
+        bg = 'bg-amber-800 border-amber-600 text-white';
+        icon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />';
+      }
+
+      toast.className = `flex items-center gap-2.5 px-4 py-3 rounded-xl border shadow-xl text-xs font-medium ${bg} transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto`;
+      toast.innerHTML = `
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icon}</svg>
+        <span>${message}</span>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => {
+          if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 300);
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
