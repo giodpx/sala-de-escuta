@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sala de Escuta do PSV</title>
+  <title>Espaço de Escuta do PSV</title>
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -91,7 +91,7 @@
     <div class="w-full aspect-[1920/450] max-h-[450px] overflow-hidden relative flex items-center justify-center bg-slate-200 border-b border-slate-300">
       <img 
         src="capa.png" 
-        alt="Banner Sala de Escuta" 
+        alt="Banner Espaço de Escuta" 
         onerror="this.style.display='none'; document.getElementById('banner-placeholder').style.display='flex';"
         class="w-full h-full object-cover"
       />
@@ -111,7 +111,7 @@
     <div class="bg-white rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200">
       <div class="space-y-3">
         <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
-          Sala de Escuta
+          Espaço de Escuta
         </h1>
         <p class="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
           Um espaço de acolhimento qualificado para ouvir prefeitos, secretários e técnicos sobre os desafios reais da gestão de saneamento e viabilização de recursos no município. Seus relatos são consolidados para transformar demandas reais em inteligência, capacitação e apoio técnico ao setor.
@@ -313,7 +313,7 @@
             </table>
           </div>
 
-          <!-- GATILHO DE TRIAGEM COM OS 4 FILTROS MARCADOS POR PADRÃO -->
+          <!-- GATILHO DE TRIAGEM COM OS 4 FILTROS COLORIDOS E PADRÃO 2 COLUNAS -->
           <div class="p-4 sm:p-5 bg-gradient-to-r from-sky-50 via-blue-50 to-indigo-50 rounded-xl border-2 border-sky-300">
             <div class="flex items-start gap-3">
               <div class="p-2 bg-brand-600 text-white rounded-lg shadow-sm">
@@ -327,26 +327,36 @@
                   Todos os eixos estão marcados para visualização completa. Desmarque apenas caso o município não tenha nenhuma dor no eixo correspondente.
                 </p>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                  <label class="flex items-center gap-2.5 p-2.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-blue-500 hover:bg-blue-50/40">
-                    <input type="checkbox" id="triage_agua" name="triage_eixos" value="Agua" checked onchange="handleTriageChange()" class="custom-checkbox">
-                    <span class="text-xs font-semibold text-slate-800">Abastecimento de Água</span>
+                <!-- Grid simétrico: 2 por linha, última linha única -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <!-- Água (Azul) -->
+                  <label class="flex items-center gap-2.5 p-3 bg-white rounded-xl border-2 border-sky-500 hover:bg-sky-50/50 cursor-pointer shadow-sm transition">
+                    <input type="checkbox" id="triage_agua" name="triage_eixos" value="Agua" checked onchange="handleTriageChange()" class="custom-checkbox h-4 w-4">
+                    <span class="text-xs font-bold text-sky-950">Abastecimento de Água</span>
                   </label>
-                  <label class="flex items-center gap-2.5 p-2.5 bg-white rounded-lg border border-amber-800/40 cursor-pointer hover:border-amber-800 hover:bg-amber-900/10">
-                    <input type="checkbox" id="triage_esgoto" name="triage_eixos" value="Esgoto" checked onchange="handleTriageChange()" class="custom-checkbox">
-                    <span class="text-xs font-semibold text-slate-800">Esgotamento Sanitário</span>
+
+                  <!-- Esgoto (Marrom PLANSAB) -->
+                  <label class="flex items-center gap-2.5 p-3 bg-white rounded-xl border-2 border-amber-900 hover:bg-amber-900/10 cursor-pointer shadow-sm transition">
+                    <input type="checkbox" id="triage_esgoto" name="triage_eixos" value="Esgoto" checked onchange="handleTriageChange()" class="custom-checkbox h-4 w-4">
+                    <span class="text-xs font-bold text-amber-950">Esgotamento Sanitário</span>
                   </label>
-                  <label class="flex items-center gap-2.5 p-2.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-amber-500 hover:bg-amber-50/40">
-                    <input type="checkbox" id="triage_residuos" name="triage_eixos" value="Residuos" checked onchange="handleTriageChange()" class="custom-checkbox">
-                    <span class="text-xs font-semibold text-slate-800">Resíduos Sólidos</span>
+
+                  <!-- Resíduos (Âmbar / Terra) -->
+                  <label class="flex items-center gap-2.5 p-3 bg-white rounded-xl border-2 border-amber-500 hover:bg-amber-50/50 cursor-pointer shadow-sm transition">
+                    <input type="checkbox" id="triage_residuos" name="triage_eixos" value="Residuos" checked onchange="handleTriageChange()" class="custom-checkbox h-4 w-4">
+                    <span class="text-xs font-bold text-amber-950">Resíduos Sólidos</span>
                   </label>
-                  <label class="flex items-center gap-2.5 p-2.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-sky-500 hover:bg-sky-50/40">
-                    <input type="checkbox" id="triage_drenagem" name="triage_eixos" value="Drenagem" checked onchange="handleTriageChange()" class="custom-checkbox">
-                    <span class="text-xs font-semibold text-slate-800">Drenagem Pluvial</span>
+
+                  <!-- Drenagem (Ciano / Azul Claro) -->
+                  <label class="flex items-center gap-2.5 p-3 bg-white rounded-xl border-2 border-cyan-500 hover:bg-cyan-50/50 cursor-pointer shadow-sm transition">
+                    <input type="checkbox" id="triage_drenagem" name="triage_eixos" value="Drenagem" checked onchange="handleTriageChange()" class="custom-checkbox h-4 w-4">
+                    <span class="text-xs font-bold text-cyan-950">Drenagem Pluvial</span>
                   </label>
-                  <label class="sm:col-span-2 flex items-center gap-2.5 p-2.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-slate-400">
-                    <input type="checkbox" id="triage_nenhum" name="triage_eixos" value="Nenhum" onchange="handleTriageNoneChange()" class="custom-checkbox">
-                    <span class="text-xs font-semibold text-slate-700">Sem gargalos nesses eixos (Saltar direto para Planejamento/PMSB)</span>
+
+                  <!-- Opção 5: Preenche toda a linha inferior -->
+                  <label class="sm:col-span-2 flex items-center gap-2.5 p-3 bg-white rounded-xl border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-50 cursor-pointer shadow-sm transition">
+                    <input type="checkbox" id="triage_nenhum" name="triage_eixos" value="Nenhum" onchange="handleTriageNoneChange()" class="custom-checkbox h-4 w-4">
+                    <span class="text-xs font-bold text-slate-700">Sem gargalos nesses eixos (Saltar direto para Planejamento/PMSB)</span>
                   </label>
                 </div>
               </div>
@@ -699,7 +709,7 @@
           </div>
         </section>
 
-        <!-- BLOCO LATERAL DE FORA -->
+        <!-- BLOCO LATERAL DE FORA (COM CONCEITO DE TRANSBORDO < 24H) -->
         <aside class="lg:col-span-4 bg-white p-4 rounded-2xl border border-amber-200 shadow-sm text-xs space-y-3">
           <div class="flex items-center gap-2 pb-2 border-b border-amber-100">
             <span class="w-2 h-2 rounded-full bg-amber-500"></span>
@@ -707,8 +717,8 @@
           </div>
           <div class="space-y-2.5 text-[11px] text-slate-600 leading-relaxed">
             <div>
-              <strong class="text-amber-900 block">Estação de Transbordo:</strong>
-              Pátio intermediário onde caminhões de coleta urbana descarregam o lixo para carretas maiores, barateando o transporte até aterros sanitários distantes.
+              <strong class="text-amber-900 block">Estação de Transbordo (Regra das 24 Horas):</strong>
+              Pátio intermediário de transferência onde caminhões de coleta urbana descarregam o lixo diretamente em carretas de grande porte para transporte até o aterro final. <span class="text-amber-950 font-bold bg-amber-50 px-1 py-0.5 rounded">Atenção sanitária:</span> o resíduo <strong>não pode permanecer acumulado por mais de 24 horas</strong> no transbordo, devendo ter esvaziamento diário contínuo para impedir proliferação de vetores, odores e chorume.
             </div>
             <div>
               <strong class="text-amber-900 block">Lixão vs. Aterro Sanitário:</strong>
@@ -730,7 +740,7 @@
               <span class="secao-badge w-8 h-8 rounded-xl bg-sky-600 text-white font-black text-sm flex items-center justify-center shadow">6</span>
               <div>
                 <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">Ficha de Escuta: Drenagem e Águas Pluviais</h3>
-                <p class="text-xs text-slate-500">Manejo pluvial, pontos de alagamento, cadastro e Defesa Civil</p>
+                <p class="text-xs text-slate-500">Mapeamento pluvial, pontos de alagamento, cadastro e Defesa Civil</p>
               </div>
             </div>
             <button type="button" onclick="closeConditionalBlock('Drenagem')" class="text-xs text-slate-400 hover:text-red-600 font-medium">✕ Ocultar</button>
@@ -928,12 +938,185 @@
         </aside>
       </div>
 
-      <!-- TÓPICO: INVESTIMENTOS E NOVO PAC -->
+      <!-- TÓPICO: REGIONALIZAÇÃO, REGULAÇÃO E ARRANJO INSTITUCIONAL (2 COLUNAS SIMÉTRICAS) -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        <section id="bloco8_investimentos" class="secao-formulario lg:col-span-8 bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-slate-200" data-base-title="Investimentos e Novo PAC">
+        <section id="bloco8_regionalizacao" class="secao-formulario lg:col-span-8 bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-slate-200" data-base-title="Regionalização, Regulação e Arranjo Institucional">
           <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
             <div class="flex items-center gap-3">
               <span class="secao-badge w-8 h-8 rounded-xl bg-purple-100 text-purple-800 font-black text-sm flex items-center justify-center border border-purple-200 shadow-sm">8</span>
+              <div>
+                <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">Regionalização, Regulação e Arranjo Institucional</h3>
+                <p class="text-xs text-slate-500">Integração do município ao bloco regional, governança e desafios regulatórios</p>
+              </div>
+            </div>
+            <span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Obrigatório</span>
+          </div>
+
+          <div class="space-y-5 text-xs">
+            <!-- Pergunta 1: 6 opções (3 pares perfeitos de 2) -->
+            <div>
+              <label class="block font-bold text-slate-700 uppercase tracking-wider mb-2">
+                1. Como o município se sente em relação ao atual processo de regionalização do saneamento? <span class="text-red-500">*</span>
+              </label>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                  <input type="radio" name="b8_reg_sentimento" value="Integrado e representado" required class="custom-checkbox">
+                  <span>Integrado e representado nas decisões</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                  <input type="radio" name="b8_reg_sentimento" value="Integrado com pouca participacao" class="custom-checkbox">
+                  <span>Integrado, mas com pouca participação nas decisões</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                  <input type="radio" name="b8_reg_sentimento" value="Ainda entendendo funcionamento" class="custom-checkbox">
+                  <span>Ainda está entendendo como a regionalização funciona</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                  <input type="radio" name="b8_reg_sentimento" value="Dificuldade para se inserir" class="custom-checkbox">
+                  <span>Sente dificuldade para se inserir ou participar do arranjo</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                  <input type="radio" name="b8_reg_sentimento" value="Nao percebe efeitos" class="custom-checkbox">
+                  <span>Não percebe efeitos da regionalização no município</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                  <input type="radio" name="b8_reg_sentimento" value="Nao sabe informar" class="custom-checkbox">
+                  <span>Não sabe informar</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Pergunta 2: 5 opções (2 pares + última opção em linha inteira) -->
+            <div>
+              <label class="block font-bold text-slate-700 uppercase tracking-wider mb-2">
+                2. Hoje, está claro para o município quem é responsável por planejar, prestar, regular e tomar decisões sobre os serviços de saneamento? <span class="text-red-500">*</span>
+              </label>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                  <input type="radio" name="b8_reg_clareza_papeis" value="Sim, bem definidas" required class="custom-checkbox">
+                  <span>Sim, as responsabilidades estão bem definidas</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                  <input type="radio" name="b8_reg_clareza_papeis" value="Parcialmente com duvidas ou sobreposicoes" class="custom-checkbox">
+                  <span>Parcialmente — ainda existem dúvidas ou sobreposições</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                  <input type="radio" name="b8_reg_clareza_papeis" value="Nao, ha indefinicao" class="custom-checkbox">
+                  <span>Não — há indefinição de responsabilidades</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                  <input type="radio" name="b8_reg_clareza_papeis" value="Varia de acordo com eixo" class="custom-checkbox">
+                  <span>Varia de acordo com o eixo do saneamento</span>
+                </label>
+                <label class="sm:col-span-2 flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                  <input type="radio" name="b8_reg_clareza_papeis" value="Nao sabe informar" class="custom-checkbox">
+                  <span>Não sabe informar</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Pergunta 3: 5 opções (2 pares + última opção em linha inteira) -->
+            <div>
+              <label class="block font-bold text-slate-700 uppercase tracking-wider mb-2">
+                3. Na percepção do município, a regionalização e o atual modelo regulatório têm ajudado ou dificultado o avanço do saneamento local? <span class="text-red-500">*</span>
+              </label>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-2.5">
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                  <input type="radio" name="b8_reg_impacto_local" value="Tem ajudado bastante" required class="custom-checkbox">
+                  <span>Têm ajudado bastante</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                  <input type="radio" name="b8_reg_impacto_local" value="Tem ajudado parcialmente" class="custom-checkbox">
+                  <span>Têm ajudado parcialmente</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                  <input type="radio" name="b8_reg_impacto_local" value="Ainda nao produziram efeitos" class="custom-checkbox">
+                  <span>Ainda não produziram efeitos percebidos</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                  <input type="radio" name="b8_reg_impacto_local" value="Tem gerado dificuldades" class="custom-checkbox">
+                  <span>Têm gerado novas dificuldades ou entraves</span>
+                </label>
+                <label class="sm:col-span-2 flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                  <input type="radio" name="b8_reg_impacto_local" value="Ainda nao consegue avaliar" class="custom-checkbox">
+                  <span>O município ainda não consegue avaliar</span>
+                </label>
+              </div>
+              <label for="b8_reg_impacto_motivo" class="block font-semibold text-slate-600 mb-1">Por quê? (Justificativa curta):</label>
+              <input type="text" id="b8_reg_impacto_motivo" name="b8_reg_impacto_motivo" placeholder="Explique brevemente a percepção do município..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800">
+            </div>
+
+            <!-- Pergunta 4: 7 opções (3 pares + 7ª opção em linha inteira + Outro) -->
+            <div>
+              <label class="block font-bold text-slate-700 uppercase tracking-wider mb-2">
+                4. O que o município mais precisa para participar melhor desse novo arranjo institucional e regulatório? (Múltipla escolha)
+              </label>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b8_reg_necessidades" value="Maior participacao nas decisoes" class="custom-checkbox">
+                  <span>Maior participação nas decisões regionais</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b8_reg_necessidades" value="Orientacao sobre papel e responsabilidades" class="custom-checkbox">
+                  <span>Orientação sobre o papel e responsabilidades do município</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b8_reg_necessidades" value="Apoio juridico e regulatorio" class="custom-checkbox">
+                  <span>Apoio jurídico e regulatório</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b8_reg_necessidades" value="Adequacao de planos e contratos" class="custom-checkbox">
+                  <span>Apoio para adequação de planos, contratos e instrumentos municipais</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b8_reg_necessidades" value="Maior articulacao prestador e agencia" class="custom-checkbox">
+                  <span>Maior articulação com prestadores e agência reguladora</span>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b8_reg_necessidades" value="Capacitacao da equipe municipal" class="custom-checkbox">
+                  <span>Capacitação da equipe municipal</span>
+                </label>
+                <label class="sm:col-span-2 flex items-center gap-2 p-2.5 bg-slate-50 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-100">
+                  <input type="checkbox" name="b8_reg_necessidades" value="Estruturacao de projetos e acesso a recursos" class="custom-checkbox">
+                  <span>Apoio para estruturação de projetos e acesso a recursos</span>
+                </label>
+              </div>
+              <div class="mt-2">
+                <input type="text" name="b8_reg_necessidades_outro" placeholder="Outro apoio necessário..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- BLOCO LATERAL DE FORA: CONCEITOS E LEI SOBRE REGIONALIZAÇÃO -->
+        <aside class="lg:col-span-4 bg-white p-4 rounded-2xl border border-purple-200 shadow-sm text-xs space-y-3">
+          <div class="flex items-center gap-2 pb-2 border-b border-purple-100">
+            <span class="w-2 h-2 rounded-full bg-purple-600"></span>
+            <h4 class="font-bold text-purple-950 uppercase tracking-wider text-[11px]">Termos & Lei — Regionalização</h4>
+          </div>
+          <div class="space-y-2.5 text-[11px] text-slate-600 leading-relaxed">
+            <div>
+              <strong class="text-purple-900 block">O que é a Prestação Regionalizada?</strong>
+              Arranjo institucional instituído pelas leis estaduais (Unidades Regionais de Saneamento Básico - URSB, Blocos Regionais ou Microrregiões) para agrupar municípios. Seu objetivo é viabilizar escala econômica, garantir subsídio cruzado (municípios maiores sustentando menores) e atrair investimentos para atingir as metas de 2033.
+            </div>
+            <div>
+              <strong class="text-purple-900 block">O que diz a Lei Federal nº 11.445/2007 (Marco Legal):</strong>
+              Conforme o <strong>Art. 50, incisos VII e VIII</strong>, a adesão formal à estrutura regionalizada é uma <strong>condicionante obrigatória</strong> para que o município possa receber recursos federais da União (OGU, FGTS e seleções do Novo PAC). Municípios que permanecerem isolados sem aderir ao arranjo ficam legalmente impedidos de contratar repasses federais.
+            </div>
+            <div>
+              <strong class="text-purple-900 block">Regulação e Normas da ANA (Art. 8º-B):</strong>
+              O município ou bloco regional deve vincular-se a uma <strong>Agência Reguladora Infranacional</strong> e adotar as Normas de Referência emitidas pela ANA (Agência Nacional de Águas e Saneamento Básico) para padronizar contratos, tarifas e indicadores.
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- TÓPICO: INVESTIMENTOS E NOVO PAC -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <section id="bloco9_investimentos" class="secao-formulario lg:col-span-8 bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-slate-200" data-base-title="Investimentos e Novo PAC">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+            <div class="flex items-center gap-3">
+              <span class="secao-badge w-8 h-8 rounded-xl bg-purple-100 text-purple-800 font-black text-sm flex items-center justify-center border border-purple-200 shadow-sm">9</span>
               <div>
                 <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">Investimentos e Novo PAC</h3>
                 <p class="text-xs text-slate-500">Diagnóstico de adesão, interesse em novas seleções e direcionamento de propostas</p>
@@ -948,10 +1131,10 @@
             <div class="p-4 bg-purple-50/70 rounded-xl border border-purple-200 space-y-4">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label for="b8_pac_contemplado" class="block font-bold text-slate-800 uppercase tracking-wider mb-1">
+                  <label for="b9_pac_contemplado" class="block font-bold text-slate-800 uppercase tracking-wider mb-1">
                     1. O município já foi contemplado no Novo PAC? <span class="text-red-500">*</span>
                   </label>
-                  <select id="b8_pac_contemplado" name="b8_pac_contemplado" required class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
+                  <select id="b9_pac_contemplado" name="b9_pac_contemplado" required class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
                     <option value="">Selecione...</option>
                     <option value="Sim_Totalmente">Sim, com propostas selecionadas e contratadas</option>
                     <option value="Sim_Em_Contratacao">Sim, selecionado (aguardando/formalizando contrato)</option>
@@ -962,10 +1145,10 @@
                 </div>
 
                 <div>
-                  <label for="b8_pac_gostaria" class="block font-bold text-slate-800 uppercase tracking-wider mb-1">
+                  <label for="b9_pac_gostaria" class="block font-bold text-slate-800 uppercase tracking-wider mb-1">
                     2. Gostaria de ser contemplado em novas seleções? <span class="text-red-500">*</span>
                   </label>
-                  <select id="b8_pac_gostaria" name="b8_pac_gostaria" required class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
+                  <select id="b9_pac_gostaria" name="b9_pac_gostaria" required class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
                     <option value="">Selecione o interesse...</option>
                     <option value="Sim_Prioridade_Maxima">Sim, é prioridade máxima da gestão atual</option>
                     <option value="Sim_Com_Apoio_Tecnico">Sim, desde que com apoio técnico para elaborar projetos</option>
@@ -976,10 +1159,10 @@
               </div>
 
               <div>
-                <label for="b8_pac_como_gostaria" class="block font-bold text-slate-800 uppercase tracking-wider mb-1">
+                <label for="b9_pac_como_gostaria" class="block font-bold text-slate-800 uppercase tracking-wider mb-1">
                   Como gostaria de ser contemplado? (Quais tipos de obra, eixo ou apoio para direcionar nossas propostas?):
                 </label>
-                <textarea id="b8_pac_como_gostaria" name="b8_pac_como_gostaria" rows="2" placeholder="Ex: Gostaríamos de ser contemplados com expansão da rede de esgoto na sede, projeto padrão para transbordo de resíduos e elaboração de projeto executivo para macrodrenagem..." class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800"></textarea>
+                <textarea id="b9_pac_como_gostaria" name="b9_pac_como_gostaria" rows="2" placeholder="Ex: Gostaríamos de ser contemplados com expansão da rede de esgoto na sede, projeto padrão para transbordo de resíduos e elaboração de projeto executivo para macrodrenagem..." class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800"></textarea>
               </div>
             </div>
 
@@ -1037,10 +1220,10 @@
             <!-- PARTE 3: HISTÓRICO RECENTE E MOTIVOS DE TRAVA -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
               <div>
-                <label for="b8_pac_experiencia" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">
+                <label for="b9_pac_experiencia" class="block font-bold text-slate-700 uppercase tracking-wider mb-1">
                   Resultado recente nas seleções do Novo PAC:
                 </label>
-                <select id="b8_pac_experiencia" name="b8_pac_experiencia" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+                <select id="b9_pac_experiencia" name="b9_pac_experiencia" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
                   <option value="">Selecione...</option>
                   <option value="Aprovado/selecionado">Aprovado / Selecionado com proposta</option>
                   <option value="Cadastrado e reprovado/inabilitado">Cadastrou proposta, mas foi Inabilitado/Reprovado</option>
@@ -1054,7 +1237,7 @@
                 <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">
                   Principal motivo de inabilitação ou desistência:
                 </label>
-                <select name="b8_pac_motivo_principal" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
+                <select name="b9_pac_motivo_principal" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs">
                   <option value="">Selecione se aplicável...</option>
                   <option value="Falta de projetos de engenharia">Falta de projetos executivos no nível exigido</option>
                   <option value="Prazo exiguo">Prazos curtos no Transferegov</option>
@@ -1097,7 +1280,7 @@
         <section id="bloco11_apoio" class="secao-formulario lg:col-span-12 bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-slate-200" data-base-title="Apoio Necessário e Fechamento">
           <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
             <div class="flex items-center gap-3">
-              <span class="secao-badge w-8 h-8 rounded-xl bg-blue-100 text-blue-800 font-black text-sm flex items-center justify-center border border-blue-200 shadow-sm">9</span>
+              <span class="secao-badge w-8 h-8 rounded-xl bg-blue-100 text-blue-800 font-black text-sm flex items-center justify-center border border-blue-200 shadow-sm">10</span>
               <div>
                 <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">Apoio Necessário e Fechamento</h3>
                 <p class="text-xs text-slate-500">Demandas prioritárias e mensagem para os órgãos federais</p>
@@ -1161,7 +1344,7 @@
         <section id="bloco12_entrevistador" class="secao-formulario lg:col-span-12 bg-slate-100 rounded-2xl p-5 sm:p-7 shadow-sm border border-slate-300" data-base-title="Registro do Entrevistador">
           <div class="flex items-center justify-between border-b border-slate-300 pb-3 mb-4">
             <div class="flex items-center gap-3">
-              <span class="secao-badge w-8 h-8 rounded-xl bg-slate-800 text-white font-black text-sm flex items-center justify-center shadow-sm">10</span>
+              <span class="secao-badge w-8 h-8 rounded-xl bg-slate-800 text-white font-black text-sm flex items-center justify-center shadow-sm">11</span>
               <div>
                 <h3 class="secao-titulo text-base sm:text-lg font-bold text-slate-900">Registro do Entrevistador</h3>
                 <p class="text-xs text-slate-500">Uso exclusivo da equipe técnica de campo (NIESADT / UNIVASF / MCID)</p>
@@ -1345,9 +1528,6 @@
 
   <!-- JAVASCRIPT -->
   <script>
-    // =========================================================================
-    // COLE AQUI A SUA URL GERADA NO APPS SCRIPT DO GOOGLE SHEETS:
-    // =========================================================================
     const GOOGLE_SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyPT9oNcs7ByyYVU5ZK4y6G-RBGxmUHWDTTbcvOmdx79fV3csvtQGhzEOcgz8j_0ahWJw/exec';
 
     const STORAGE_KEY_DRAFT = 'sanea_draft_v7';
@@ -1660,7 +1840,7 @@
       if (txt) txt.textContent = `${pct}%`;
     }
 
-    // GERA OBJETO PLANIFICADO COM EXATAMENTE OS CABEÇALHOS DA PLANILHA
+    // GERA OBJETO PLANIFICADO (REGIONALIZAÇÃO ANTES DO NOVO PAC)
     function buildSpreadsheetPayload(record) {
       const projs = Array.isArray(record.projetos_pac) ? record.projetos_pac : [];
       const p1 = projs[0] || {};
@@ -1668,6 +1848,11 @@
       const p3 = projs[2] || {};
       const p4 = projs[3] || {};
       const p5 = projs[4] || {};
+
+      let necRegionalizacao = Array.isArray(record.b8_reg_necessidades) ? [...record.b8_reg_necessidades] : (record.b8_reg_necessidades ? [record.b8_reg_necessidades] : []);
+      if (record.b8_reg_necessidades_outro && record.b8_reg_necessidades_outro.trim() !== '') {
+        necRegionalizacao.push(`Outro: ${record.b8_reg_necessidades_outro.trim()}`);
+      }
 
       return {
         'ID_Escuta': record.id || '',
@@ -1721,11 +1906,20 @@
         'PMSB_Situacao': record.b7_pmsb_status || '',
         'PMSB_Orienta_Investimentos': record.b7_pmsb_orienta || '',
         'PMSB_Obstaculos_Travas': Array.isArray(record.b7_pmsb_obstaculos) ? record.b7_pmsb_obstaculos.join(', ') : (record.b7_pmsb_obstaculos || ''),
-        'PAC_Contemplado_Status': record.b8_pac_contemplado || '',
-        'PAC_Gostaria_Contemplado': record.b8_pac_gostaria || '',
-        'PAC_Como_Gostaria_Apoio': record.b8_pac_como_gostaria || '',
-        'NovoPAC_Resultado': record.b8_pac_experiencia || '',
-        'NovoPAC_Motivo_Inabilitacao': record.b8_pac_motivo_principal || '',
+        
+        // REGIONALIZAÇÃO (ANTES DO NOVO PAC):
+        'Regionalizacao_Sentimento': record.b8_reg_sentimento || '',
+        'Regionalizacao_Clareza_Papeis': record.b8_reg_clareza_papeis || '',
+        'Regionalizacao_Impacto_Local': record.b8_reg_impacto_local || '',
+        'Regionalizacao_Impacto_Motivo': record.b8_reg_impacto_motivo || '',
+        'Regionalizacao_Necessidades': necRegionalizacao.join(', '),
+
+        // NOVO PAC E INVESTIMENTOS:
+        'PAC_Contemplado_Status': record.b9_pac_contemplado || '',
+        'PAC_Gostaria_Contemplado': record.b9_pac_gostaria || '',
+        'PAC_Como_Gostaria_Apoio': record.b9_pac_como_gostaria || '',
+        'NovoPAC_Resultado': record.b9_pac_experiencia || '',
+        'NovoPAC_Motivo_Inabilitacao': record.b9_pac_motivo_principal || '',
         'PAC_P1_Objeto': p1.objeto || '',
         'PAC_P1_Situacao': p1.situacao || '',
         'PAC_P1_Valor': p1.valor || '',
@@ -1746,6 +1940,7 @@
         'PAC_P5_Situacao': p5.situacao || '',
         'PAC_P5_Valor': p5.valor || '',
         'PAC_P5_Impedimento': p5.impedimento || '',
+
         'Apoio_Tipos_Demandados': Array.isArray(record.b11_apoio_tipos) ? record.b11_apoio_tipos.join(', ') : (record.b11_apoio_tipos || ''),
         'Acao_Urgente_12_Meses': record.b11_problema_12meses || '',
         'Recado_Ministerio_Cidades': record.b11_desabafo_ministerio || '',
@@ -1793,9 +1988,15 @@
         return;
       }
 
-      if (!data.b8_pac_contemplado) {
+      if (!data.b8_reg_sentimento) {
+        showToast('Responda à questão sobre regionalização.', 'error');
+        document.getElementById('bloco8_regionalizacao').scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+
+      if (!data.b9_pac_contemplado) {
         showToast('Informe se o município já foi contemplado no PAC.', 'error');
-        document.getElementById('bloco8_investimentos').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('bloco9_investimentos').scrollIntoView({ behavior: 'smooth' });
         return;
       }
 
@@ -1815,16 +2016,16 @@
         ...data
       };
 
-      // 1. Salva no banco local com ID imutável
+      // 1. Salva no banco local
       const list = getStoredInterviews();
       list.unshift(record);
       saveStoredInterviews(list);
 
-      // 2. Dispara envio assíncrono para o Google Sheets (Apps Script adiciona nova linha ao fim)
+      // 2. Dispara envio assíncrono para o Google Sheets
       const payload = buildSpreadsheetPayload(record);
       const cloudSuccess = await sendToGoogleSheets(payload);
 
-      // 3. LIMPEZA TOTAL IMEDIATA DO FORMULÁRIO PARA NÃO DEIXAR ALTERAR
+      // 3. Limpeza total do formulário
       localStorage.removeItem(STORAGE_KEY_DRAFT);
       document.getElementById('saneaForm').reset();
       populateProjectsData([]);
@@ -1917,7 +2118,7 @@
 
       const csvContent = '\uFEFF' + rows.join('\r\n');
       const today = new Date().toISOString().slice(0,10);
-      downloadFile(csvContent, `sanea_brasil_todas_escutas_${today}.csv`, 'text/csv;charset=utf-8;');
+      downloadFile(csvContent, `escuta_todas_${today}.csv`, 'text/csv;charset=utf-8;');
       showToast(`${list.length} escuta(s) exportada(s) com sucesso!`, 'success');
     }
 
@@ -1950,7 +2151,7 @@
       const list = getStoredInterviews();
       const dataStr = JSON.stringify(list, null, 2);
       const today = new Date().toISOString().slice(0,10);
-      downloadFile(dataStr, `sanea_brasil_backup_${today}.json`, 'application/json');
+      downloadFile(dataStr, `escuta_backup_${today}.json`, 'application/json');
       showToast('Backup JSON exportado!', 'success');
     }
 
